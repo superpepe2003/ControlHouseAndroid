@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".menuPrincipal"
+    tools:showIn="@layout/app_bar_menu_principal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnMovimientos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Movimientos"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/botones"
+            android:textColor="@color/colorForeBlanco"
+            android:onClick="BotonesClick"
+            />
+        <Button
+            android:id="@+id/btnCuentas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cuentas"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/botones"
+            android:textColor="@color/colorForeBlanco"
+            android:onClick="BotonesClick"
+            />
+        <Button
+            android:id="@+id/btnCategorias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Categorias"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/botones"
+            android:textColor="@color/colorForeBlanco"
+            android:onClick="BotonesClick"
+            />
+
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

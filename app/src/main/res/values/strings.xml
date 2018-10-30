@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Control House</string>
+    <string name="txt_usuario">Usuario</string>
+    <string name="txt_pass">Password</string>
+    <string name="btn_login">Ingresar</string>
+    <string name="title_activity_menu_principal">Menu Principal</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_desc">Cabecera de Navegador</string>
+    <string name="action_settings">Settings</string>
+    <string name="nav_cuentas">Cuentas</string>
+    <string name="nav_movimientos">Movimientos</string>
+    <string name="nav_categorias">Categorias</string>
+
+
+    <!-- MOVIMIENTOS -->
+    <string name="nav_header_title_movimientos">Movimientos</string>
+    <string name="nav_header_subtitle_movimientos">Registro de operaciones diarias</string>
+    <string name="title_activity_movimientos">Movimientos</string>
+    <string name="nav_movimientos_ingresar">Ingresar</string>
+    <string name="nav_movimientos_actualizar">Modificar</string>
+    <string name="nav_movimientos_eliminar">Eliminar</string>
+    <string name="nav_movimientos_listar">Listar</string>
+
+
+</resources>
