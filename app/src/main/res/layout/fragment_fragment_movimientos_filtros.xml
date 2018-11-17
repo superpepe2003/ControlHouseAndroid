@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Movimientos.fragment_movimientos_filtros"
+    android:background="@color/colorPrimaryLight">
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="20dp">
+
+         <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_action_close"
+                    android:background="#aaa"
+                    android:id="@+id/btnClose"/>
+
+                <Button
+                    android:id="@+id/btn_aplicar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    android:text="@string/btn_filtrar_aplicar"
+                    android:textColor="@color/colorForeBlanco"
+                    android:background="#00000000"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </android.support.constraint.ConstraintLayout>
+
+        <!-- *************************** -->
+        <!-- Ordenar por fecha-->
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margen_entre_controles_filtro_movimiento"
+            android:layout_marginBottom="@dimen/margen_entre_controles_filtro_movimiento">
+            <View android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/separador"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="@string/movimiento_filtro_fecha_ordenar"
+                android:textColor="@color/colorForeBlanco"
+                android:layout_weight="1"
+                android:gravity="center"
+                />
+            <View android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/separador"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+
+            <!-- TODO: Update blank fragment layout -->
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <RadioButton
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:paddingRight="10dp"
+                android:paddingLeft="5dp"
+                android:text="Mas actuales"
+                android:textSize="10sp"
+                android:textColor="@color/colorForeBlanco"
+                android:button="@null"
+                android:id="@+id/btn_filtrar_fecha_actuales"/>
+            <RadioButton
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="5dp"
+                android:text="Mas antiguos"
+                android:button="@null"
+                android:textSize="10sp"
+                android:textColor="@color/colorForeBlanco"
+                android:id="@+id/btn_filtrar_fechas_viejas"/>
+
+        </RadioGroup>
+
+        <!-- *************************** -->
+        <!-- Filtrar por Ingreso y Egreso-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/margen_entre_controles_filtro_movimiento"
+            >
+
+            <View android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/separador"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="@string/movimiento_filtro_por_ingreso_egreso"
+                android:textColor="@color/colorForeBlanco"
+                android:layout_weight="1"
+                android:gravity="center"
+                />
+            <View android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/separador"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+
+        <!-- BODY  -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <CheckBox
+                    android:id="@+id/chkIngresos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/movimiento_filtro_por_ingreso"
+                    android:textSize="10sp"
+                    android:button="@null"
+                    android:textColor="@color/colorForeBlanco"
+                    android:gravity="center"
+                    />
+
+                <CheckBox
+                    android:id="@+id/chkEgresos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/movimiento_filtro_por_egreso"
+                    android:textSize="10sp"
+                    android:button="@null"
+                    android:textColor="@color/colorForeBlanco"
+                    android:gravity="center"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- *************************** -->
+        <!-- Layout de Fechas-->
+
+        <!-- HEAD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/margen_entre_controles_filtro_movimiento"
+            >
+
+            <View android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/separador"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="@string/movimiento_filtro_fecha"
+                android:textColor="@color/colorForeBlanco"
+                android:layout_weight="1"
+                android:gravity="center"
+                />
+            <View android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/separador"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+
+        <!-- BODY  -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:id="@+id/chkFechas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:text="@string/movimiento_filtro_por_fechas"
+                android:textSize="10sp"
+                android:button="@null"
+                android:textColor="@color/colorForeBlanco"
+                android:gravity="center"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/lnFechas"
+                android:orientation="vertical"
+                android:visibility="invisible">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/movimiento_filtro_desde"
+                        android:textColor="@color/colorForeBlanco"
+                        android:textSize="10sp"/>
+                    <Button
+                        android:id="@+id/btn_fecha_inicial"
+                        android:enabled="false"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/colorForeBlanco"
+                        android:textSize="10sp"
+                        android:background="#00000000" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/movimiento_filtro_hasta"
+                        android:textColor="@color/colorForeBlanco"
+                        android:textSize="10sp"/>
+                    <Button
+                        android:id="@+id/btn_fecha_final"
+                        android:enabled="false"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:textColor="@color/colorForeBlanco"
+                        android:textSize="10sp"
+                        android:background="#00000000" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- *************************** -->
+        <!-- FILTRAR POR MONTOS -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/margen_entre_controles_filtro_movimiento"
+            android:layout_marginBottom="@dimen/margen_entre_controles_filtro_movimiento"
+            >
+
+            <View android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/separador"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="@string/movimiento_filtro_rango_montos"
+                android:textColor="@color/colorForeBlanco"
+                android:layout_weight="1"
+                android:gravity="center"
+                />
+            <View android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/separador"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+
+        </LinearLayout>
+
+        <!--<org.florescu.android.rangeseekbar.RangeSeekBar
+            android:id="@+id/rangeSeekbar2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:defaultColor="@color/colorForeBlanco"
+            app:absoluteMaxValue="17000"
+            app:absoluteMinValue="0"
+            />-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar
+                android:id="@+id/rangeSeekbar1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:bar_color="@color/colorForeBlanco"
+                app:bar_highlight_color="@color/colorPrimary"
+                app:left_thumb_color="@color/colorForeBlanco"
+                app:right_thumb_color="@color/colorForeBlanco"
+                />
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/txtMinimo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:layout_editor_absoluteY="0dp" />
+
+                <TextView
+                    android:id="@+id/txtMaximo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="18dp"
+                    android:text="100"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </android.support.constraint.ConstraintLayout>
+        </LinearLayout>
+
+
+
+        <!-- *************************** -->
+        <!-- FILTRAR POR CONTENIDO -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/margen_entre_controles_filtro_movimiento"
+            android:layout_marginBottom="10dp"
+            >
+
+            <View android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/separador"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:text="@string/movimiento_filtro_contenido"
+                android:textColor="@color/colorForeBlanco"
+                android:layout_weight="1"
+                android:gravity="center"
+                />
+            <View android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="@drawable/separador"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            >
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/movimiento_filtro_contiene"
+                android:textColorHint="@color/colorForeBlanco"
+                android:layout_margin="10dp"
+                android:id="@+id/txtContenidoLayout">
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtMovimientoFiltroContenido"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    />
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    </ScrollView>
+</FrameLayout>
+
+    <!--android:button="@null"
+                android:drawableTop="@drawable/radiobutton"-->

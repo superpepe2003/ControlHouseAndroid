@@ -1,6 +1,7 @@
 package com.controlhouse.utopiasoft.controlhouse;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -42,7 +43,7 @@ public class menuPrincipal extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            finish();
         }
     }
 
@@ -81,6 +82,9 @@ public class menuPrincipal extends AppCompatActivity
 
         } else if (id == R.id.nav_categoria) {
 
+        }else if (id == R.id.nav_salir) {
+            BorrarUsuario();
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -102,5 +106,16 @@ public class menuPrincipal extends AppCompatActivity
             case R.id.btnCategorias:
                 break;
         }
+    }
+
+    private void BorrarUsuario() {
+
+        SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+        SharedPreferences.Editor edit = pref.edit();
+
+        edit.putString("usuario", "");
+        edit.putString("password", "");
+
+        edit.commit();
     }
 }

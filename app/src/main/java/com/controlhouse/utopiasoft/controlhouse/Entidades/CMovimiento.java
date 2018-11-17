@@ -1,5 +1,7 @@
 package com.controlhouse.utopiasoft.controlhouse.Entidades;
 
+import android.support.annotation.NonNull;
+
 import java.util.Date;
 
 public class CMovimiento {
@@ -99,4 +101,6 @@ public class CMovimiento {
     public void setTipo(Boolean tipo) {
         Tipo = tipo;
     }
+
+
 }

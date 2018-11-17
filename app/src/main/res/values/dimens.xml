@@ -6,4 +6,6 @@
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="logo">175dp</dimen>
+    <dimen name="icono_filtrar">90dp</dimen>
+    <dimen name="margen_entre_controles_filtro_movimiento">30dp</dimen>
 </resources>

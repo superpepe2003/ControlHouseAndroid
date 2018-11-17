@@ -20,7 +20,9 @@
 
     <item android:title="Administrador">
         <menu>
-
+            <item
+                android:id="@+id/nav_salir"
+                android:title="Salir" />
         </menu>
     </item>
 
