@@ -42,7 +42,7 @@ public class fragment_movimientos_filtros extends DialogFragment {
 
     RadioButton btnSortActual, btnSortFechaVieja;
     ImageButton btnClose;
-    Button btnAplicar, btnFechaInicial, btnFechaFinal;
+    Button btnAplicar, btnFechaInicial, btnFechaFinal, btnLimpiarFiltro;
     CheckBox chkFechas, chkIngreso, chkEgreso;
     LinearLayout lnFechas;
     TextView txtMaximo, txtMinimo;
@@ -86,6 +86,7 @@ public class fragment_movimientos_filtros extends DialogFragment {
         btnSortFechaVieja = v.findViewById(R.id.btn_filtrar_fechas_viejas);
         btnClose = v.findViewById(R.id.btnClose);
         btnAplicar = v.findViewById(R.id.btn_aplicar);
+        btnLimpiarFiltro = v.findViewById(R.id.btnLimpiarFiltro);
 
         chkFechas =  v.findViewById(R.id.chkFechas);
         chkIngreso=v.findViewById(R.id.chkIngresos);
@@ -102,23 +103,12 @@ public class fragment_movimientos_filtros extends DialogFragment {
         txtContenido = v.findViewById(R.id.txtMovimientoFiltroContenido);
         txtLayoutContenido = v.findViewById(R.id.txtContenidoLayout);
 
-        calendario = Calendar.getInstance();
-
-        int month = calendario.get(Calendar.MONTH) + 1;
-        int day = calendario.get(Calendar.DAY_OF_MONTH);
-        int year= calendario.get(Calendar.YEAR);
-
-        fechaNow = Integer.toString(day) + "/" + Integer.toString(month) + "/" + Integer.toString(year);
+        fechaNow = FechaNow();
 
         btnFechaInicial.setText(fechaNow);
         btnFechaFinal.setText(fechaNow);
 
-
-
-
-
         CargarFiltro();
-
 
         //Imagen en RadioButton
 
@@ -261,6 +251,13 @@ public class fragment_movimientos_filtros extends DialogFragment {
             }
         });
 
+        btnLimpiarFiltro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LimpiarFiltro();
+            }
+        });
+
         return v;
     }
 
@@ -272,12 +269,32 @@ public class fragment_movimientos_filtros extends DialogFragment {
                 btnSortActual.setChecked(true);
             else if(filtro.getFecha()==2)
                 btnSortFechaVieja.setChecked(true);
+            else
+            {
+                btnSortActual.setChecked(false);
+                btnSortFechaVieja.setChecked(false);
+            }
 
             if(filtro.isFiltroPorFecha())
             {
                 chkFechas.setChecked(true);
                 btnFechaFinal.setText(filtro.getFechaFinal());
                 btnFechaInicial.setText(filtro.getFechaInicial());
+            }
+            else
+            {
+                chkFechas.setChecked(false);
+                btnFechaFinal.setText(FechaNow());
+                btnFechaInicial.setText(FechaNow());
+            }
+
+            if(filtro.getTipo()==-1)
+                chkEgreso.setChecked(true);
+            else if(filtro.getTipo()==1)
+                chkIngreso.setChecked(true);
+            else {
+                chkEgreso.setChecked(false);
+                chkIngreso.setChecked(false);
             }
         }
 
@@ -304,6 +321,24 @@ public class fragment_movimientos_filtros extends DialogFragment {
 
         if(filtro.getContenido()!=null)
             txtLayoutContenido.setHint(filtro.getContenido());
+    }
+
+    public void LimpiarFiltro()
+    {
+        filtro.setFecha(0);
+        filtro.setContenido("");
+        filtro.setFiltroPorFecha(false);
+        filtro.setTipo(0);
+        filtro.setMontoMinimo(new Double(_min));
+        filtro.setMontoMaximo(new Double(_max));
+        filtro.setFechaInicial(FechaNow());
+        filtro.setFechaFinal(FechaNow());
+
+        CargarFiltro();
+
+        CargarRadioButtonFechas();
+        CargarCheckbokFecha();
+        CargarCheckbokIngresoEgreso();
     }
 
     private void ShowCalendario(final int i) {
@@ -389,8 +424,8 @@ public class fragment_movimientos_filtros extends DialogFragment {
 
     public void CargarRadioButtonFechas()
     {
-        Drawable top = resizeImage(getContext(), R.drawable.icono_fecha,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
-        Drawable topChecked = resizeImage(getContext(), R.drawable.icono_fecha_seleccionado,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
+        //Drawable top = resizeImage(getContext(), R.drawable.icono_fecha,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
+        //Drawable topChecked = resizeImage(getContext(), R.drawable.icono_fecha_seleccionado,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
         //RadioButton
         if(btnSortActual.isChecked())
             btnSortActual.setCompoundDrawablesWithIntrinsicBounds(null, drawableActualSelec , null, null);
@@ -457,6 +492,18 @@ public class fragment_movimientos_filtros extends DialogFragment {
 
         drawableFecha = resizeImage(getContext(), R.drawable.icono_fecha_checkbok,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
         drawableFechaSelec = resizeImage(getContext(), R.drawable.icono_fecha_seleccionado_checkbok,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
+    }
+
+    private String FechaNow()
+    {
+        calendario = Calendar.getInstance();
+
+        int month = calendario.get(Calendar.MONTH) + 1;
+        int day = calendario.get(Calendar.DAY_OF_MONTH);
+        int year= calendario.get(Calendar.YEAR);
+
+        return Integer.toString(day) + "/" + Integer.toString(month) + "/" + Integer.toString(year);
+
     }
 
 }

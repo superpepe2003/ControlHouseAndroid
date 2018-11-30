@@ -15,10 +15,14 @@ public class CMovimiento {
     private String hashtag;
     private Boolean Tipo;
 
+    private int idCategoria;
+    private int idSubCategoria;
+    private int idCuenta;
+
     public CMovimiento() {
     }
 
-    public CMovimiento(int id, Date fecha, String categoria, String subCategoria, String cuenta, double monto, String descripcion, String hashtag, Boolean Tipo) {
+    public CMovimiento(int id, Date fecha, String categoria, String subCategoria, String cuenta, double monto, String descripcion, String hashtag, Boolean tipo, int idCategoria, int idSubCategoria, int idCuenta) {
         this.id = id;
         this.fecha = fecha;
         this.categoria = categoria;
@@ -27,7 +31,10 @@ public class CMovimiento {
         this.monto = monto;
         this.descripcion = descripcion;
         this.hashtag = hashtag;
-        this.Tipo= Tipo;
+        Tipo = tipo;
+        this.idCategoria = idCategoria;
+        this.idSubCategoria = idSubCategoria;
+        this.idCuenta = idCuenta;
     }
 
     public int getId() {
@@ -36,6 +43,30 @@ public class CMovimiento {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getIdCategoria() {
+        return idCategoria;
+    }
+
+    public void setIdCategoria(int idCategoria) {
+        this.idCategoria = idCategoria;
+    }
+
+    public int getIdSubCategoria() {
+        return idSubCategoria;
+    }
+
+    public void setIdSubCategoria(int idSubCategoria) {
+        this.idSubCategoria = idSubCategoria;
+    }
+
+    public int getIdCuenta() {
+        return idCuenta;
+    }
+
+    public void setIdCuenta(int idCuenta) {
+        this.idCuenta = idCuenta;
     }
 
     public Date getFecha() {

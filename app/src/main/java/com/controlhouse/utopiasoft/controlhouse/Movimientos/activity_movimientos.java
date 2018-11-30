@@ -20,10 +20,14 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.controlhouse.utopiasoft.controlhouse.Entidades.CCategorias;
+import com.controlhouse.utopiasoft.controlhouse.Entidades.CCuenta;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CFiltroMovimientos;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CMovimiento;
+import com.controlhouse.utopiasoft.controlhouse.Entidades.CSubCategorias;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.IFiltro;
 import com.controlhouse.utopiasoft.controlhouse.R;
 
@@ -45,6 +49,9 @@ public class activity_movimientos extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Response.Listener<JSONObject>, Response.ErrorListener, IFiltro {
 
     ArrayList<CMovimiento> listaMovimientos, listaMovimientosFiltrado;
+    ArrayList<CCategorias> listaCategorias;
+    ArrayList<CSubCategorias> listaSubCategorias;
+    ArrayList<CCuenta> listaCuentas;
     RecyclerView recyclerPersonajes;
 
     RequestQueue request;
@@ -78,8 +85,14 @@ public class activity_movimientos extends AppCompatActivity
 
         listaMovimientos =  new ArrayList<>();
         listaMovimientosFiltrado = new ArrayList<>();
+        listaCategorias =  new ArrayList<>();
+        listaSubCategorias =  new ArrayList<>();
+        listaCuentas =  new ArrayList<>();
         request = Volley.newRequestQueue(getApplicationContext());
-        cargarWS();
+        cargarWSMovimientos();
+        cargarWsCategorias();
+        cargarWsSubCategorias();
+        cargarWsCuentas();
 
         recyclerPersonajes=findViewById(R.id.idListaMovimientos);
 
@@ -89,7 +102,7 @@ public class activity_movimientos extends AppCompatActivity
 
     }
 
-    private void cargarWS() {
+    private void cargarWSMovimientos() {
 
         String URL="http://utopiasoft.duckdns.org:8080/wscontrol/servicemovimientos.php?modo=L";
 
@@ -97,6 +110,28 @@ public class activity_movimientos extends AppCompatActivity
         request.add(jsonObjectRequest);
     }
 
+    private void cargarWsCategorias(){
+        String URL="http://utopiasoft.duckdns.org:8080/wscontrol/servicecategorias.php?modo=L";
+
+        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, URL, null, this,this);
+        request.add(jsonObjectRequest);
+    }
+
+    private void cargarWsSubCategorias()
+    {
+        String URL="http://utopiasoft.duckdns.org:8080/wscontrol/servicesubcategorias.php?modo=L";
+
+        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, URL, null, this,this);
+        request.add(jsonObjectRequest);
+    }
+
+    private void cargarWsCuentas()
+    {
+        String URL="http://utopiasoft.duckdns.org:8080/wscontrol/servicecuentas.php?modo=L";
+
+        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, URL, null, this,this);
+        request.add(jsonObjectRequest);
+    }
 
     @Override
     public void onErrorResponse(VolleyError error) {
@@ -108,42 +143,110 @@ public class activity_movimientos extends AppCompatActivity
     public void onResponse(JSONObject response) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         CMovimiento mov = null;
+        CCategorias cat = null;
+        CSubCategorias subcat=null;
+        CCuenta cuent = null;
         int cboolean;
 
-        JSONArray json = response.optJSONArray("movimientosmodel");
+        JSONArray jsonCategorias = response.optJSONArray("categoriamodel");
+        JSONArray jsonSubCategorias= response.optJSONArray("subcategoriamodel");
+        JSONArray jsonCuentas=response.optJSONArray("cuentasmodel");
+        JSONArray jsonMovimientos = response.optJSONArray("movimientosmodel");
 
         try{
-            for(int i=0; i<json.length();i++){
-                mov= new CMovimiento();
-                JSONObject jsonObject=null;
-                jsonObject= json.getJSONObject(i);
+            if (jsonMovimientos!=null) {
+                for (int i = 0; i < jsonMovimientos.length(); i++) {
+                    mov = new CMovimiento();
+                    JSONObject jsonObject = null;
+                    jsonObject = jsonMovimientos.getJSONObject(i);
 
 
-                mov.setId(jsonObject.optInt("id"));
-                mov.setCategoria(jsonObject.optString("Categoria"));
-                mov.setSubCategoria(jsonObject.optString("SubCategoria"));
-                mov.setCuenta(jsonObject.optString("Cuenta"));
-                mov.setMonto(jsonObject.optDouble("Monto"));
-                JSONObject jsonObjectFecha = jsonObject.getJSONObject("fecha");
-                String sFecha= jsonObjectFecha.optString("date");
-                sFecha = sFecha.substring(0,10);
-                mov.setFecha(formatter.parse(sFecha));
-                mov.setHashtag(jsonObject.optString("HashTag"));
-                mov.setDescripcion(jsonObject.optString("Descripcion"));
-                cboolean = (jsonObject.optInt("Tipo"));
-                if(cboolean==1)
-                    mov.setTipo(true);
-                else
-                    mov.setTipo(false);
+                    mov.setId(jsonObject.optInt("id"));
+                    mov.setCategoria(jsonObject.optString("Categoria"));
+                    mov.setSubCategoria(jsonObject.optString("SubCategoria"));
+                    mov.setCuenta(jsonObject.optString("Cuenta"));
+                    mov.setMonto(jsonObject.optDouble("Monto"));
+                    JSONObject jsonObjectFecha = jsonObject.getJSONObject("fecha");
+                    String sFecha = jsonObjectFecha.optString("date");
+                    sFecha = sFecha.substring(0, 10);
+                    mov.setFecha(formatter.parse(sFecha));
+                    mov.setHashtag(jsonObject.optString("HashTag"));
+                    mov.setDescripcion(jsonObject.optString("Descripcion"));
+                    cboolean = (jsonObject.optInt("Tipo"));
+                    mov.setIdCategoria(jsonObject.optInt("CategoriaId"));
+                    mov.setIdSubCategoria(jsonObject.optInt("SubCategoriaId"));
+                    mov.setIdCuenta(jsonObject.optInt("CuentaId"));
 
-                listaMovimientos.add(mov);
+                    if (cboolean == 1)
+                        mov.setTipo(true);
+                    else
+                        mov.setTipo(false);
 
-                if(mov.getMonto()>_maximo)
-                    _maximo=mov.getMonto();
-                if(mov.getMonto()<_minimo)
-                    _minimo=mov.getMonto();
+                    listaMovimientos.add(mov);
 
-                _total+=mov.getMonto();
+                    if (mov.getMonto() > _maximo)
+                        _maximo = mov.getMonto();
+                    if (mov.getMonto() < _minimo)
+                        _minimo = mov.getMonto();
+
+                    _total += mov.getMonto();
+                }
+            }
+            if(jsonCategorias!=null) {
+                //Toast.makeText(getApplicationContext(), "HAY CATEGORIAS", Toast.LENGTH_LONG).show();
+                for (int i = 0; i < jsonCategorias.length(); i++) {
+                    cat = new CCategorias();
+                    JSONObject jsonObject = null;
+                    jsonObject = jsonCategorias.getJSONObject(i);
+
+                    cat.setId(jsonObject.optInt("Id"));
+                    cat.setNombre(jsonObject.optString("Nombre"));
+
+                    listaCategorias.add(cat);
+                }
+            }
+
+            if(jsonSubCategorias!=null)
+            {
+                //Toast.makeText(getApplicationContext(), "HAY SUBCATEGORIAS", Toast.LENGTH_LONG).show();
+                for (int i = 0; i < jsonSubCategorias.length(); i++) {
+                    subcat = new CSubCategorias();
+                    JSONObject jsonObject = null;
+                    jsonObject = jsonSubCategorias.getJSONObject(i);
+
+                    subcat.setId(jsonObject.optInt("Id"));
+                    subcat.setNombre(jsonObject.optString("Nombre"));
+                    subcat.setIdCategoria(jsonObject.optInt("CategoriaId"));
+                    subcat.setCategoria(jsonObject.optString("Categoria"));
+                    subcat.setMonto((float)(jsonObject.optDouble("Monto")));
+                    int fija = jsonObject.optInt("FijaMensualmente");
+                    int tipo= jsonObject.optInt("Tipo");
+                    if(fija==1)
+                        subcat.setFija(true);
+                    else
+                        subcat.setFija(false);
+                    if(tipo==1)
+                        subcat.setTipo(true);
+                    else
+                        subcat.setTipo(false);
+
+                    listaSubCategorias.add(subcat);
+                }
+            }
+
+            if(jsonCuentas!=null) {
+                //Toast.makeText(getApplicationContext(), "HAY CUENTAS", Toast.LENGTH_LONG).show();
+                for (int i = 0; i < jsonCuentas.length(); i++) {
+                    cuent = new CCuenta();
+                    JSONObject jsonObject = null;
+                    jsonObject = jsonCuentas.getJSONObject(i);
+
+                    cuent.setId(jsonObject.optInt("Id"));
+                    cuent.setNombre(jsonObject.optString("Nombre"));
+                    cuent.setSaldo((float)(jsonObject.optDouble("Saldo")));
+
+                    listaCuentas.add(cuent);
+                }
             }
         }
         catch (JSONException e)
@@ -161,7 +264,7 @@ public class activity_movimientos extends AppCompatActivity
                 new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
     }
 
-    private void llenarMovimientos() {
+    /*private void llenarMovimientos() {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         try {
             listaMovimientos.add(new CMovimiento(1, formatter.parse("12/10/2018"), "Ventas", "Productos", "Caja", 100, "", "", true));
@@ -173,7 +276,7 @@ public class activity_movimientos extends AppCompatActivity
         catch (ParseException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     @Override
     public void onBackPressed() {
@@ -214,7 +317,18 @@ public class activity_movimientos extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_movimientos_ingresar) {
-            // Handle the camera action
+            FragmentManager fr =  getSupportFragmentManager();
+            fragment_movimientos_ingreso fragment_ingreso =  new fragment_movimientos_ingreso(listaMovimientos, listaCuentas, listaCategorias, listaSubCategorias);
+
+            // The device is smaller, so show the fragment fullscreen
+            FragmentTransaction transaction = fr.beginTransaction();
+            // For a little polish, specify a transition animation
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            // To make it fullscreen, use the 'content' root view as the container
+            // for the fragment, which is always the root view for the activity
+            transaction.add(android.R.id.content, fragment_ingreso)
+                    .addToBackStack(null).commit();
+
         } else if (id == R.id.nav_movimientos_actualizar) {
 
         } else if (id == R.id.nav_movimientos_eliminar) {

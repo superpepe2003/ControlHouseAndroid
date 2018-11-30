@@ -14,6 +14,19 @@
 
 
     <!-- MOVIMIENTOS -->
+    <string name="movimiento_titulo">Movimientos</string>
+    <string name="movimiento_campo_categoria">Categoria</string>
+    <string name="movimiento_campo_subcategoria">Sub Categoria</string>
+    <string name="movimiento_campo_cuenta">Cuenta</string>
+    <string name="movimiento_campo_fecha">Fecha</string>
+    <string name="movimiento_campo_monto">Monto</string>
+    <string name="movimiento_campo_descripcion">Descripcion</string>
+    <string name="movimiento_campo_tipo">Tipo</string>
+    <string name="movimiento_campo_hashtag">HashTag</string>
+    <string name="movimiento_campo_monto_hint">Ingrese el monto</string>
+    <string name="movimiento_campo_hashtag_hint">Ingrese hashtag separados por espacio</string>
+    <string name="movimiento_campo_descripcion_hint">Ingrese una descripcion</string>
+
     <string name="nav_header_title_movimientos">Movimientos</string>
     <string name="nav_header_subtitle_movimientos">Registro de operaciones diarias</string>
     <string name="title_activity_movimientos">Movimientos</string>
@@ -39,6 +52,7 @@
     <string name="movimiento_filtro_rango_montos">RANGO DE MONTOS</string>
     <string name="movimiento_filtro_contenido">CONTENIDO</string>
     <string name="movimiento_filtro_contiene">Contiene</string>
+    <string name="movimiento_filtro_limpiar">Limpiar Filtro</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

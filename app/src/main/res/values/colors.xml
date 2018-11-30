@@ -4,5 +4,7 @@
     <color name="colorPrimaryDark">#591481</color>
     <color name="colorAccent">#d45bf9</color>
     <color name="colorForeBlanco">#fff</color>
-    <color name="colorPrimaryLight">#a360f1</color>
+    <color name="colorPrimaryLight">#db8eff</color>
+    <color name="colorForeFiltro">#591481</color>
+    <color name="colorPrimaryDarkAlpha">#40591481</color>
 </resources>
