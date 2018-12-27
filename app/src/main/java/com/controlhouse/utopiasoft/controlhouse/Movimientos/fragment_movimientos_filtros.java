@@ -1,8 +1,6 @@
 package com.controlhouse.utopiasoft.controlhouse.Movimientos;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,7 +8,6 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
@@ -61,13 +58,17 @@ public class fragment_movimientos_filtros extends DialogFragment {
     //FILTRO QUE VAMOS A PASAR A LA ACTIVIDAD
     final CFiltroMovimientos filtro;
     final float _min, _max;
+    boolean isCalendario;
 
     CrystalRangeSeekbar seekbar;
 
-    public fragment_movimientos_filtros(CFiltroMovimientos filtro, double _min, double _max) {
+    LinearLayout headfecha, bodyfecha;
+
+    public fragment_movimientos_filtros(CFiltroMovimientos filtro, double _min, double _max, boolean isCalendario) {
         this.filtro = filtro;
         this._max=(float)_max;
         this._min=(float) _min;
+        this.isCalendario=isCalendario;
     }
 
     @Override
@@ -80,7 +81,7 @@ public class fragment_movimientos_filtros extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // inflo el fragmento con el layout creado
-        View v =  inflater.inflate(R.layout.fragment_fragment_movimientos_filtros, container, false);
+        View v =  inflater.inflate(R.layout.mov_dialog_fragment_filtros, container, false);
 
         btnSortActual = v.findViewById(R.id.btn_filtrar_fecha_actuales);
         btnSortFechaVieja = v.findViewById(R.id.btn_filtrar_fechas_viejas);
@@ -107,6 +108,20 @@ public class fragment_movimientos_filtros extends DialogFragment {
 
         btnFechaInicial.setText(fechaNow);
         btnFechaFinal.setText(fechaNow);
+
+        headfecha= v.findViewById(R.id.idheadFecha);
+        bodyfecha= v.findViewById(R.id.idbodyfecha);
+
+        if(isCalendario)
+        {
+            headfecha.setVisibility(View.GONE);
+            bodyfecha.setVisibility(View.GONE);
+        }
+        else
+        {
+            headfecha.setVisibility(View.VISIBLE);
+            bodyfecha.setVisibility(View.VISIBLE);
+        }
 
         CargarFiltro();
 
@@ -153,8 +168,10 @@ public class fragment_movimientos_filtros extends DialogFragment {
                 if(actuales){filtro.setFecha(1);}
                 if(viejas){filtro.setFecha(2);}
 
-                filtro.setFechaInicial(btnFechaInicial.getText().toString());
-                filtro.setFechaFinal(btnFechaFinal.getText().toString());
+                if(!isCalendario) {
+                    filtro.setFechaInicial(btnFechaInicial.getText().toString());
+                    filtro.setFechaFinal(btnFechaFinal.getText().toString());
+                }
 
                 filtro.setMontoMinimo(Double.parseDouble(txtMinimo.getText().toString()));
                 filtro.setMontoMaximo(Double.parseDouble(txtMaximo.getText().toString()));
@@ -255,6 +272,14 @@ public class fragment_movimientos_filtros extends DialogFragment {
             @Override
             public void onClick(View v) {
                 LimpiarFiltro();
+                try {
+                    ((IFiltro) getActivity()).setFiltro(filtro);
+                }
+                catch (ParseException e)
+                {
+                    Toast.makeText(getContext(),"Error en convertir fechas: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                dismiss();
             }
         });
 
@@ -413,7 +438,7 @@ public class fragment_movimientos_filtros extends DialogFragment {
         AlertDialog.Builder builder= new AlertDialog.Builder(getActivity());
 
 //        LayoutInflater inflater = getActivity().getLayoutInflater();
-//        View v = inflater.inflate(R.layout.fragment_fragment_movimientos_filtros, null);
+//        View v = inflater.inflate(R.layout.mov_dialog_fragment_filtros, null);
 
         //builder.setView(v);
 

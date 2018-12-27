@@ -2,36 +2,29 @@ package com.controlhouse.utopiasoft.controlhouse.Movimientos;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
+
 import android.text.Editable;
-import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -41,16 +34,16 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CCategorias;
+import com.controlhouse.utopiasoft.controlhouse.Entidades.CConeccion;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CCuenta;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CMovimiento;
-import com.controlhouse.utopiasoft.controlhouse.Entidades.CSubCategorias;
+import com.controlhouse.utopiasoft.controlhouse.Entidades.IFiltro;
 import com.controlhouse.utopiasoft.controlhouse.R;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,17 +58,18 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
     ArrayList<CMovimiento> listaMovimientos;
     ArrayList<CCuenta> listaCuentas;
     ArrayList<CCategorias> listaCategorias;
-    ArrayList<CSubCategorias> listaSubCategorias;
+    int tipo, cateId, cuentaId;
+    CMovimiento movModifica;
+    boolean isModificacion; //false es ingreso true es modificacion
 
     HashMap<Integer, String> cCuenta = new HashMap<Integer, String>();
     HashMap<Integer, String> cCategoria = new HashMap<Integer, String>();
-    HashMap<Integer, String> cSubCategoria = new HashMap<Integer, String>();
 
     ScrollView scrollIngreso;
 
-    Button btnFecha, btnIngreso;
+    Button btnFecha, btnIngreso, btnCategorias;
     ImageButton btnClose;
-    Spinner cboCategoria, cboCuenta, cboSubCategoria;
+    Spinner cboCuenta;
     TextInputEditText txtDescripcion, txtHashtag, txtMonto;
 
     Drawable drawableIngreso, drawableIngresoSelec, drawableEgreso, drawableEgresoSelec;
@@ -85,12 +79,19 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
     RequestQueue request;
     JsonObjectRequest jsonObjectRequest;
 
-    public fragment_movimientos_ingreso(ArrayList<CMovimiento> listaMovimientos, ArrayList<CCuenta> listaCuentas, ArrayList<CCategorias> listaCategorias, ArrayList<CSubCategorias> listaSubCategorias) {
+    public fragment_movimientos_ingreso(int tipo, ArrayList<CMovimiento> listaMovimientos, ArrayList<CCuenta> listaCuentas, ArrayList<CCategorias> listaCategorias, int cuentaId, int cateId, CMovimiento mov) {
         // Required empty public constructor
         this.listaMovimientos= listaMovimientos;
         this.listaCuentas=listaCuentas;
-        this.listaSubCategorias=listaSubCategorias;
         this.listaCategorias=listaCategorias;
+        this.tipo=tipo;
+        this.cateId=cateId;
+        this.cuentaId=cuentaId;
+        this.movModifica=mov;
+        if(mov==null)
+            isModificacion=false;
+        else
+            isModificacion=true;
     }
 
 
@@ -104,67 +105,37 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_movimientos_ingreso, container, false);
+        View v = inflater.inflate(R.layout.mov_dialog_fragment_ingreso, container, false);
 
         btnClose = v.findViewById(R.id.btnClose);
         btnIngreso = v.findViewById(R.id.btn_aplicar);
         btnFecha = v.findViewById(R.id.btn_fecha);
         cboCuenta = v.findViewById(R.id.cboCuenta);
-        cboCategoria = v.findViewById(R.id.cboCategoria);
-        cboSubCategoria = v.findViewById(R.id.cboSubCategoria);
-        rdbIngreso= v.findViewById(R.id.rdb_Ingreso);
+        btnCategorias = v.findViewById(R.id.btnCategorias);
+        /*rdbIngreso= v.findViewById(R.id.rdb_Ingreso);
         rdbEgreso=v.findViewById(R.id.rdb_Egreso);
-        rdbEgreso.setChecked(true);
+        rdbEgreso.setChecked(true);*/
         txtHashtag=v.findViewById(R.id.txthashtag);
         scrollIngreso = v.findViewById(R.id.ScrollIngreso);
         txtMonto = v.findViewById(R.id.txtMonto);
         txtDescripcion = v.findViewById(R.id.txtDescripcion);
 
-        CargarImagenesDeRadioButton();
-        CargarRadioButtonIngresoEgreso();
+        /* CargarImagenesDeRadioButton();
+        CargarRadioButtonIngresoEgreso();*/
         CargarCombos();
 
-
         btnFecha.setText(fechaNow());
+        btnCategorias.setText(getCategoriaId(cateId));
 
         request = Volley.newRequestQueue(getContext());
+
+        if(isModificacion)
+            CargarDatos();
 
         btnFecha.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ShowCalendario();
-            }
-        });
-
-        rdbIngreso.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(rdbIngreso.isChecked())
-                {
-                    CargarRadioButtonIngresoEgreso();
-                }
-            }
-        });
-
-        rdbEgreso.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(rdbEgreso.isChecked())
-                {
-                    CargarRadioButtonIngresoEgreso();
-                }
-            }
-        });
-
-        cboCategoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                CargarSubCategoria(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
@@ -174,21 +145,6 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
                 dismiss();
             }
         });
-
-
-
-        /*txtHashtag.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if((event.getAction()==KeyEvent.ACTION_DOWN) && (keyCode==KeyEvent.KEYCODE_SPACE))
-                {
-                    txtHashtag.setText(PonerHash());
-                    txtHashtag.setSelection(txtHashtag.getText().length());
-                    return true;
-                }
-                return false;
-            }
-        });*/
 
         txtHashtag.addTextChangedListener(new TextWatcher() {
             Boolean editado=true;
@@ -236,23 +192,78 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
                     txtHashtag.setText(PonerHash());
                 if(VerificarDatos())
                 {
-                    GrabarDatos();
+                    if(isModificacion)
+                        ModificarDatos();
+                    else
+                        GrabarDatos();
                 }
+                else
+                {
+                    Toast.makeText(getContext(),"No puede dejar el campo Monto vacio", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnCategorias.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fragment_lista_categorias frg = new fragment_lista_categorias(listaCategorias, -1, tipo,true);
+                frg.setTargetFragment(fragment_movimientos_ingreso.this,1);
+                frg.show(getActivity().getSupportFragmentManager(), "dialogListaCategoria");
             }
         });
 
         return v;
     }
 
+    private void CargarDatos(){
+        String d,m,a;
+        d =  DateFormat.format("dd",movModifica.getFecha()).toString();
+        m = DateFormat.format("MM",movModifica.getFecha()).toString();
+        a = DateFormat.format("yy",movModifica.getFecha()).toString();
+        txtMonto.setText(Double.toString(movModifica.getMonto()));
+        txtHashtag.setText(movModifica.getHashtag());
+        txtDescripcion.setText(movModifica.getDescripcion());
+        btnFecha.setText(d +"/"+ m +"/"+a);
+        cboCuenta.setId(movModifica.getIdCuenta());
+        btnCategorias.setText(getCategoriaId(movModifica.getIdCategoria()));
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1)
+        {
+            int _idCate= data.getIntExtra("id", -1);
+            if(_idCate!=-1) {
+                cateId=_idCate;
+                btnCategorias.setText(getCategoriaId(cateId));
+            }
+        }
+    }
+
+    public String getCategoriaId(int id)
+    {
+        for(CCategorias cat:listaCategorias)
+        {
+            if(id!=-1) {
+                if (cat.getId() == id)
+                    return cat.getNombre();
+            }
+            else
+                return cat.getNombre();
+        }
+        return "";
+    }
 
     private boolean VerificarDatos()
     {
-        if(txtDescripcion.getText()==null)
-        {
-
-        }
-        if(txtMonto.getText()!=null) {
-            return true;
+        if(txtMonto.getText().length()>0) {
+            double p = Double.parseDouble(txtMonto.getText().toString());
+            if(!Double.isNaN(p)) {
+                if(btnCategorias.getText().toString().length()>0)
+                    return true;
+            }
         }
 
         return false;
@@ -261,26 +272,49 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
 
     private void GrabarDatos()
     {
-        String URL = "http://utopiasoft.duckdns.org:8080/wscontrol/servicemovimientos.php?modo=C";
+
+        //SpinnerDatos categoriaSeleccionada = (SpinnerDatos) cboCategoria.getSelectedItem();
+        SpinnerDatos cuentaSeleccionada= (SpinnerDatos) cboCuenta.getSelectedItem();
+
         String _fecha= "&fecha=" + btnFecha.getText().toString();
         String _monto = "&monto=" + txtMonto.getText().toString();
-        String _descripcion= "&descripcion=" + txtDescripcion.getText().toString();
+        String _descripcion= "&descripcion=" + txtDescripcion.getText().toString().replace(" ","%20");
         String _hashtag= "&hashtag=" + traerHashtag();
-        String _categoria = "&categoriaid=" + listaCategorias.get(cboCategoria.getSelectedItemPosition()).getId();
-        int _subCatId = DevolverIdSubCategoria(listaCategorias.get(cboCategoria.getSelectedItemPosition()).getId());
-        String _subcategoria ="&subcategoriaid=";
-        if(_subCatId!=-1) {
+        String _categoria="&categoriaid=" + cateId;
+        //String _categoria="&categoriaid=" + categoriaSeleccionada.getValor();
+        //String _categoria = "&categoriaid=" + listaCategorias.get(cboCategoria.getSelectedItemPosition()).getId();
+
+        /*if(_subCatId!=-1) {
             _subcategoria += _subCatId;
-        }
-        String _cuenta= "&cuentaid=" + listaCuentas.get(cboCuenta.getSelectedItemPosition()).getId();
-        String _tipo;
-        if(rdbIngreso.isChecked())
-            _tipo="&tipo=1";
-        else
-            _tipo="&tipo=0";
+        }*/
+        //String _cuenta= "&cuentaid=" + listaCuentas.get(cboCuenta.getSelectedItemPosition()).getId();
+
+        String _cuenta="&cuentaid=" + cuentaSeleccionada.getValor();
+        String _tipo = "&tipo=" + tipo;
 
 
-        String Url2 = URL + _fecha + _cuenta + _categoria + _subcategoria + _monto + _tipo + _hashtag + _descripcion;
+        String Url2 = CConeccion.URL_Ingreso_Movimiento + CConeccion.bd + _fecha + _cuenta + _categoria + _monto + _tipo + _descripcion + _hashtag ;
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,Url2, null, this, this);
+        request.add(jsonObjectRequest);
+    }
+
+    private void ModificarDatos()
+    {
+        SpinnerDatos cuentaSeleccionada= (SpinnerDatos) cboCuenta.getSelectedItem();
+
+        String _id="&id=" + movModifica.getId();
+        String _fecha= "&fecha=" + btnFecha.getText().toString();
+        String _monto = "&monto=" + txtMonto.getText().toString();
+        String _descripcion= "&descripcion=" + txtDescripcion.getText().toString().replace(" ","%20");
+        String _hashtag= "&hashtag=" + traerHashtag();
+        String _categoria="&categoriaid=" + cateId;
+        String _cuenta="&cuentaid=" + cuentaSeleccionada.getValor();
+        String _tipo = "&tipo=" + tipo;
+        String _cuentavieja="&cuentaidvieja=" + movModifica.getIdCuenta();
+        String _montoviejo="&montoviejo=" + movModifica.getMonto();
+
+
+        String Url2 = CConeccion.URL_Modificar_Movimiento + CConeccion.bd + _id + _fecha + _cuenta + _categoria + _monto + _tipo + _hashtag + _descripcion + _cuentavieja + _montoviejo;
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,Url2, null, this, this);
         request.add(jsonObjectRequest);
     }
@@ -356,19 +390,22 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
     }
 
     private void CargarCombos() {
-        ArrayList<String> lCuentas = new ArrayList<String>();
-        ArrayList<String> lCategorias= new ArrayList<String>();
+        ArrayList<SpinnerDatos> lCuentas = new ArrayList<SpinnerDatos>();
+        int i=0, pos=0;
         //HashMap<Integer , String> lCuentas = new HashMap<Integer, String>();
         //HashMap<Integer , String> lCategorias = new HashMap<Integer, String>();
 
 
         for(CCuenta rcuenta :listaCuentas) {
-            lCuentas.add(rcuenta.getNombre());
+            lCuentas.add(new SpinnerDatos(rcuenta.getNombre().toUpperCase(),rcuenta.getId()));
+            if(rcuenta.getId()==cuentaId)
+                pos=i;
+            i++;
         }
 
-        for(CCategorias rCategoria :listaCategorias) {
-            lCategorias.add(rCategoria.getNombre());
-        }
+        /*for(CCategorias rCategoria :listaCategorias) {
+            lCategorias.add(new SpinnerDatos(rCategoria.getNombre(),rCategoria.getId()));
+        }*/
 
         if(lCuentas.isEmpty())
         {
@@ -376,54 +413,23 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
             dismiss();
         }
 
-        if(lCategorias.isEmpty())
+        /*if(lCategorias.isEmpty())
         {
             Toast.makeText(getContext(),"No existen categorias, no puede agregar Movimientos", Toast.LENGTH_SHORT).show();
             dismiss();
-        }
-        ArrayAdapter<String> adapterCuenta;
-        adapterCuenta = new ArrayAdapter<String>(getContext(), R.layout.spinnerpersonalizado,lCuentas);
+        }*/
+        ArrayAdapter<SpinnerDatos> adapterCuenta;
+        adapterCuenta = new ArrayAdapter<SpinnerDatos>(getContext(), R.layout.spinnerpersonalizado,lCuentas);
 
-        ArrayAdapter<String> adapterCategoria;
-        adapterCategoria = new ArrayAdapter<String>(getContext(), R.layout.spinnerpersonalizado, lCategorias);
+        //ArrayAdapter<SpinnerDatos> adapterCategoria;
+        //adapterCategoria = new ArrayAdapter<SpinnerDatos>(getContext(), R.layout.spinnerpersonalizado, lCategorias);
 
         cboCuenta.setAdapter(adapterCuenta);
-        cboCategoria.setAdapter(adapterCategoria);
-        CargarSubCategoria(0);
+        //cboCategoria.setAdapter(adapterCategoria);
 
+        cboCuenta.setSelection(pos);
     }
 
-    public void CargarSubCategoria(int i)
-    {
-        ArrayList<String> lSubCategorias= new ArrayList<String>();
-        for(CSubCategorias rSubCategorias: listaSubCategorias)
-        {
-            if (rSubCategorias.getIdCategoria() == listaCategorias.get(i).getId()) {
-                lSubCategorias.add(rSubCategorias.getNombre());
-            }
-        }
-
-        ArrayAdapter<String> adapterSubCategoria;
-        adapterSubCategoria = new ArrayAdapter<String>(getContext(), R.layout.spinnerpersonalizado,lSubCategorias);
-
-        cboSubCategoria.setAdapter(adapterSubCategoria);
-    }
-
-    public int DevolverIdSubCategoria(int id)
-    {
-        int position = cboSubCategoria.getSelectedItemPosition();
-        int index=0;
-
-        for(CSubCategorias rSubCategorias: listaSubCategorias)
-        {
-            if (rSubCategorias.getIdCategoria() == id) {
-                if(index==position)
-                    return rSubCategorias.getId();
-                index++;
-            }
-        }
-        return -1;
-    }
 
     public String fechaNow()
     {
@@ -436,7 +442,7 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
        return Integer.toString(day) + "/" + Integer.toString(month) + "/" + Integer.toString(year);
     }
 
-    public void CargarRadioButtonIngresoEgreso()
+/*    public void CargarRadioButtonIngresoEgreso()
     {
         //Drawable top = resizeImage(getContext(), R.drawable.icono_fecha,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
         //Drawable topChecked = resizeImage(getContext(), R.drawable.icono_fecha_seleccionado,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
@@ -457,7 +463,7 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
 
         drawableEgreso= resizeImage(getContext(), R.drawable.icono_egreso_checkbok,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)),(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
         drawableEgresoSelec = resizeImage(getContext(), R.drawable.icono_egreso_checkbok_seleccionado,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)),(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
-    }
+    }*/
 
     public Drawable resizeImage(Context ctx, int resId, int w, int h) {
 
@@ -494,26 +500,47 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        Toast.makeText(getContext(),"ah ocurrido un error al guardar, " + error.getMessage().toString() , Toast.LENGTH_SHORT).show();
+        if (error == null || error.networkResponse == null) {
+            return;
+        }
+
+        String body;
+        //get status code here
+        final String statusCode = String.valueOf(error.networkResponse.statusCode);
+        //get response body and parse with appropriate encoding
+        try {
+            body = new String(error.networkResponse.data,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // exception
+        }
+
+        //Toast.makeText(getContext(),"ah ocurrido un error al guardar, " + error.getMessage().toString() , Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onResponse(JSONObject response) {
         try {
-        JSONArray jsonArray = response.optJSONArray("idMovimiento");
-        JSONObject jsonObject = null;
-
-            jsonObject = jsonArray.getJSONObject(0);
+            JSONObject jsonObject = response.getJSONObject("resultado");
 
 
-            int id= jsonObject.optInt("id");
+            int id= jsonObject.optInt("valor");
 
-            if(id>0)
-                Toast.makeText(getContext(),"Se ha Grabado Correctamente", Toast.LENGTH_SHORT).show();
+
+            if(id>0) {
+                if(isModificacion)
+                    Toast.makeText(getContext(), "Se ha Modificado Correctamente", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getContext(), "Se ha Grabado Correctamente", Toast.LENGTH_SHORT).show();
+
+                ((IFiltro)getActivity()).cargarWSMovimientos();
+
+                if(isModificacion)
+                    dismiss();
+                LimpiarCampos();
+            }
             else
                 Toast.makeText(getContext(),"El dato no pudo Grabarse", Toast.LENGTH_SHORT).show();
 
-            LimpiarCampos();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -525,6 +552,31 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
         txtHashtag.setText("");
         txtMonto.setText("");
         btnFecha.setText(fechaNow());
-        rdbEgreso.setChecked(true);
     }
 }
+
+class SpinnerDatos
+        {
+            private String text;
+            private int valor;
+
+            public SpinnerDatos(String text, int valor) {
+                this.text = text;
+                this.valor = valor;
+            }
+
+            public int getValor()
+            {
+                return valor;
+            }
+
+            public String getTexto()
+            {
+                return text;
+            }
+
+            public String toString()
+            {
+                return text;
+            }
+        }

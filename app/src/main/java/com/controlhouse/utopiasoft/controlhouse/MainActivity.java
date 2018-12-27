@@ -8,7 +8,9 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.controlhouse.utopiasoft.controlhouse.Entidades.CConeccion;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CUsuario;
+import com.controlhouse.utopiasoft.controlhouse.Movimientos.activity_movimientos;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,13 +47,32 @@ public class MainActivity extends AppCompatActivity {
 
     public void Ingreso(boolean preingreso)
     {
-        if((_Usuario.getUsuario().equals("admin")) && (_Usuario.getPassword().equals("12345")))
+        if((_Usuario.getUsuario().equals("admin")) && (_Usuario.getPassword().equals("admin")))
         {
             if(!preingreso)
                 if(chkUsuario.isChecked())
                     GuardarUsuario();
-            Intent in = new Intent(this, menuPrincipal.class);
+            //Intent in = new Intent(this, menuPrincipal.class);
+            //startActivity(in);
+
+            CConeccion.bd=CConeccion.bdEjemplo;
+            Intent in =  new Intent(this, activity_movimientos.class);
             startActivity(in);
+
+            finish();
+        }
+        else if((_Usuario.getUsuario().equals("silpab")) && (_Usuario.getUsuario().equals("silpab")))
+        {
+            if(!preingreso)
+                if(chkUsuario.isChecked())
+                    GuardarUsuario();
+            //Intent in = new Intent(this, menuPrincipal.class);
+            //startActivity(in);
+
+            CConeccion.bd=CConeccion.bdReal;
+            Intent in =  new Intent(this, activity_movimientos.class);
+            startActivity(in);
+
             finish();
         }
     }

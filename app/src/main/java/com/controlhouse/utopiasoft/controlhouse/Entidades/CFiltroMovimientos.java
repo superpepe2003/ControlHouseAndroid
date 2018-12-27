@@ -3,14 +3,14 @@ package com.controlhouse.utopiasoft.controlhouse.Entidades;
 import java.util.Date;
 
 public class CFiltroMovimientos {
-    int Fecha; // 1 ORDENA ASCENDENTE Y 2 ORDENA DESCENDENTE
+    int Fecha = 1; // 1 ORDENA ASCENDENTE Y 2 ORDENA DESCENDENTE
     boolean filtroPorFecha;
-    int tipo; // -1 EGRESOS / 0 TODOS / 1 INGRESOS
+    int tipo = 0; // -1 EGRESOS / 0 TODOS / 1 INGRESOS
     String fechaInicial;
     String fechaFinal;
     Double montoMinimo;
     Double montoMaximo;
-    String contenido;
+    String contenido="";
 
     public CFiltroMovimientos(int fecha, boolean filtroPorFecha, String fechaInicial, String fechaFinal, Double montoMinimo, Double montoMaximo, String contenido, int tipo) {
         Fecha = fecha;

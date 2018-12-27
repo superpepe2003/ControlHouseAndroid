@@ -19,15 +19,35 @@
 
     <style name="miSpinner" parent="AppTheme">
         <item name="android:spinnerDropDownItemStyle">@style/mySpinnerItemStyle</item>
-        <item name="android:popupBackground">@color/colorPrimaryLight</item>
+        <item name="android:popupBackground">@color/colorForeBlanco</item>
         <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/combobox</item>
+        <item name="android:background">@drawable/btnrecyclerview</item>
     </style>
 
     <style name="mySpinnerItemStyle" parent="@android:style/Widget.Holo.DropDownItem.Spinner">
         <item name="android:textColor">@color/colorPrimaryDark</item>
-        <item name="android:textSize">8sp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:gravity">center</item>
+    </style>
+
+    <style name="etiqueta">
+        <item name="android:background">@drawable/fondo_eti_fab</item>
+        <item name="android:textColor">@color/colorForeBlanco</item>
+    </style>
+
+    <style name="miTema" parent="AppTheme">
+        <!-- <item name="android:background">@color/colorPrimary</item> -->
+        <item name="android:textColor">#f5f5f5</item>
+        <item name="android:textColorPrimary">#efefef</item>
+        <item name="colorControlNormal">#fff</item>
+        <item name="colorControlHighlight">#333b3b3b</item>
+    </style>
+
+    <style name="WallSearchView" parent="miTema">
+        ...
+        <item name="iconifiedByDefault">false</item>
+        <item name="colorControlActivated">#FFffffff</item>
     </style>
 
 </resources>

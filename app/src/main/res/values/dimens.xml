@@ -10,4 +10,7 @@
     <dimen name="margen_entre_controles_filtro_movimiento">30dp</dimen>
     <dimen name="margen_entre_controles_filtro_movimiento_reducido">15dp</dimen>
     <dimen name="filtro_grosor_de_linea">1dp</dimen>
+    <dimen name="movimientos_margen_entre_botones">3dp</dimen>
+    <dimen name="fab_principal">80dp</dimen>
+    <dimen name="fab_opciones">70dp</dimen>
 </resources>

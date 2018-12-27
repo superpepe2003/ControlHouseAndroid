@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item android:title="@string/nav_acciones">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_cuentas_nueva"
+                    android:icon="@drawable/ic_action_add"
+                    android:title="@string/nav_cuentas_nuevas" />
+                <item
+                    android:id="@+id/nav_cuentas_transacciones"
+                    android:icon="@drawable/ic_action_sub"
+                    android:title="@string/nav_cuentas_transacciones" />
+            </group>
+        </menu>
+    </item>
+    <item android:title="@string/nav_seccion">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_movimientos"
+                    android:icon="@drawable/ic_menu_moviemintos"
+                    android:title="@string/nav_movimientos"/>
+                <item
+                    android:id="@+id/nav_cuentas"
+                    android:icon="@drawable/ic_menu_caja"
+                    android:title="@string/nav_cuentas" />
+                <item
+                    android:id="@+id/nav_categoria"
+                    android:icon="@drawable/ic_menu_categorias"
+                    android:title="@string/nav_categorias" />
+            </group>
+        </menu>
+    </item>
+    <item android:title="@string/nav_administrador">
+        <menu>
+            <item
+                android:id="@+id/nav_salir"
+                android:title="Salir" />
+        </menu>
+    </item>
+
+</menu>

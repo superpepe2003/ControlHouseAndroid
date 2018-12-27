@@ -6,5 +6,10 @@
     <color name="colorForeBlanco">#fff</color>
     <color name="colorPrimaryLight">#db8eff</color>
     <color name="colorForeFiltro">#591481</color>
-    <color name="colorPrimaryDarkAlpha">#40591481</color>
+    <color name="colorPrimaryDarkAlpha">#99591481</color>
+    <color name="colorForeGris">#777777</color>
+    <color name="colorAdd">#147c14</color>
+    <color name="colorSub">#ae1717</color>
+    <color name="colorEtiquetaFab">#998120c7</color>
+    <color name="colorPrimaryLightAlpha">#64db8eff</color>
 </resources>

@@ -13,6 +13,12 @@
     <string name="nav_categorias">Categorias</string>
 
 
+    <!-- MENU -->
+    <string name="nav_acciones">Acciones</string>
+    <string name="nav_seccion">Secciones</string>
+    <string name="nav_administrador">Administrador</string>
+
+
     <!-- MOVIMIENTOS -->
     <string name="movimiento_titulo">Movimientos</string>
     <string name="movimiento_campo_categoria">Categoria</string>
@@ -26,6 +32,7 @@
     <string name="movimiento_campo_monto_hint">Ingrese el monto</string>
     <string name="movimiento_campo_hashtag_hint">Ingrese hashtag separados por espacio</string>
     <string name="movimiento_campo_descripcion_hint">Ingrese una descripcion</string>
+    <string name="movimiento_seleccione_categoria">¿Seleccione una Categoria?</string>
 
     <string name="nav_header_title_movimientos">Movimientos</string>
     <string name="nav_header_subtitle_movimientos">Registro de operaciones diarias</string>
@@ -34,6 +41,11 @@
     <string name="nav_movimientos_actualizar">Modificar</string>
     <string name="nav_movimientos_eliminar">Eliminar</string>
     <string name="nav_movimientos_listar">Listar</string>
+    <string name="nav_movimiento_ingreso">Ingreso</string>
+    <string name="nav_movimiento_pago">Pago</string>
+
+    <string name="movimiento_calendario_lista">Calendario</string>
+    <string name="movimiento_filtro">Filtrar</string>
 
     <string name="movimiento_filtro_fecha_ordenar">ORDENAR</string>
     <string name="btn_filtrar_fechas_actuales">Mas Actuales</string>
@@ -50,12 +62,36 @@
     <string name="movimiento_filtro_hasta">Hasta</string>
 
     <string name="movimiento_filtro_rango_montos">RANGO DE MONTOS</string>
-    <string name="movimiento_filtro_contenido">CONTENIDO</string>
-    <string name="movimiento_filtro_contiene">Contiene</string>
+    <string name="movimiento_filtro_contenido">BUSCAR</string>
+    <string name="movimiento_filtro_contiene">Buscar</string>
     <string name="movimiento_filtro_limpiar">Limpiar Filtro</string>
+
+    <string name="nav_movimientos_fab_ingresar">Ingreso</string>
+    <string name="nav_movimientos_fab_subtraer">Pago</string>
+
+    <!-- CUENTAS -->
+    <string name="title_activity_cuentas">Cuentas</string>
+
+    <string name="nav_header_title_cuentas">Cuentas</string>
+    <string name="nav_header_subtitle_cuentas">Saldo al dia y transacciones</string>
+    <string name="nav_cuentas_nuevas">Nueva Cuenta</string>
+    <string name="nav_cuentas_transacciones">Transacciones</string>
+
+    <string name="cuenta_campo_nombre">Nombre de Cuenta</string>
+    <string name="cuenta_campo_saldo">Saldo</string>
+
+    <!-- SALDO -->
+    <string name="categoria_campo_nombre">Nombre de Categoria</string>
+    <string name="categoria_campo_categoriapadre">Categoria Padre</string>
+    <string name="categoria_campo_isfija">Se repite mensualmente</string>
+    <string name="categoria_campo_monto">Monto fijo</string>
+
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="nav_header_title">Control House</string>
+    <string name="nav_header_subtitle">pablofretes@gmail.com</string>
 
 
 </resources>

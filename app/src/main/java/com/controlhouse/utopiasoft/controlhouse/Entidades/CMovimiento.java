@@ -8,33 +8,31 @@ public class CMovimiento {
     private int id;
     private Date fecha;
     private String categoria;
-    private String subCategoria;
     private String cuenta;
     private double monto;
     private String descripcion;
     private String hashtag;
     private Boolean Tipo;
+    private String catePadre;
 
     private int idCategoria;
-    private int idSubCategoria;
     private int idCuenta;
 
     public CMovimiento() {
     }
 
-    public CMovimiento(int id, Date fecha, String categoria, String subCategoria, String cuenta, double monto, String descripcion, String hashtag, Boolean tipo, int idCategoria, int idSubCategoria, int idCuenta) {
+    public CMovimiento(int id, Date fecha, String categoria, String catPadre, String cuenta, double monto, String descripcion, String hashtag, Boolean tipo, int idCategoria, int idCuenta) {
         this.id = id;
         this.fecha = fecha;
         this.categoria = categoria;
-        this.subCategoria = subCategoria;
         this.cuenta = cuenta;
         this.monto = monto;
         this.descripcion = descripcion;
         this.hashtag = hashtag;
         Tipo = tipo;
         this.idCategoria = idCategoria;
-        this.idSubCategoria = idSubCategoria;
         this.idCuenta = idCuenta;
+        this.catePadre=catPadre;
     }
 
     public int getId() {
@@ -51,14 +49,6 @@ public class CMovimiento {
 
     public void setIdCategoria(int idCategoria) {
         this.idCategoria = idCategoria;
-    }
-
-    public int getIdSubCategoria() {
-        return idSubCategoria;
-    }
-
-    public void setIdSubCategoria(int idSubCategoria) {
-        this.idSubCategoria = idSubCategoria;
     }
 
     public int getIdCuenta() {
@@ -83,14 +73,6 @@ public class CMovimiento {
 
     public void setCategoria(String categoria) {
         this.categoria = categoria;
-    }
-
-    public String getSubCategoria() {
-        return subCategoria;
-    }
-
-    public void setSubCategoria(String subCategoria) {
-        this.subCategoria = subCategoria;
     }
 
     public String getCuenta() {
@@ -131,6 +113,14 @@ public class CMovimiento {
 
     public void setTipo(Boolean tipo) {
         Tipo = tipo;
+    }
+
+    public String getCatePadre() {
+        return catePadre;
+    }
+
+    public void setCatePadre(String catePadre) {
+        this.catePadre = catePadre;
     }
 
 

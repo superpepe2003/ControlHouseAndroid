@@ -1,11 +1,16 @@
 package com.controlhouse.utopiasoft.controlhouse.Movimientos;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,22 +19,27 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.controlhouse.utopiasoft.controlhouse.Cuentas.activity_cuentas;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CCategorias;
+import com.controlhouse.utopiasoft.controlhouse.Entidades.CConeccion;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CCuenta;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CFiltroMovimientos;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CMovimiento;
-import com.controlhouse.utopiasoft.controlhouse.Entidades.CSubCategorias;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.IFiltro;
 import com.controlhouse.utopiasoft.controlhouse.R;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,42 +47,69 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 public class activity_movimientos extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Response.Listener<JSONObject>, Response.ErrorListener, IFiltro {
 
     ArrayList<CMovimiento> listaMovimientos, listaMovimientosFiltrado;
     ArrayList<CCategorias> listaCategorias;
-    ArrayList<CSubCategorias> listaSubCategorias;
     ArrayList<CCuenta> listaCuentas;
     RecyclerView recyclerPersonajes;
 
     RequestQueue request;
     JsonObjectRequest jsonObjectRequest;
 
+    FloatingActionButton fab_ingreso, fab_pago;
+
     //FILTRO QUE VAMOS A PASAR
     final CFiltroMovimientos filtroMovimiento = new CFiltroMovimientos();
 
     //Montos
-    double _minimo, _maximo, _total;
+    double _minimo, _maximo, _totalIngreso, _totalEgreso;
+    TextView txtTotales, txtEgreso, txtIngreso;
+    View viewTotales;
+
+    //Id para poner los mas usados o si es una modificacion
+    int _idCategoriaIngreso, _idCategoriaEgreso,_idCuenta;
+
+    //Si esta o no el calendario
+    Calendar calendario;
+    boolean isCalendario;
+    ConstraintLayout layoutCalendario;
+    MaterialCalendarView almanaque;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movimientos);
+        setContentView(R.layout.mov_activity);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+        almanaque = findViewById(R.id.calendario);
+
+        isCalendario=false;
         _minimo=0.0;
         _maximo=0.0;
-        _total=0.0;
+        _totalIngreso=0.0;
+        _totalEgreso=0.0;
+
+        fab_ingreso = findViewById(R.id.fabAgregar);
+        fab_pago=findViewById(R.id.fabSub);
+
+        txtTotales=findViewById(R.id.txtTotales);
+        txtEgreso=findViewById(R.id.txtEgreso);
+        txtIngreso=findViewById(R.id.txtIngreso);
+
+        layoutCalendario=findViewById(R.id.linearLayout5);
+
+        //cargarCheckbox();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -86,50 +123,130 @@ public class activity_movimientos extends AppCompatActivity
         listaMovimientos =  new ArrayList<>();
         listaMovimientosFiltrado = new ArrayList<>();
         listaCategorias =  new ArrayList<>();
-        listaSubCategorias =  new ArrayList<>();
         listaCuentas =  new ArrayList<>();
         request = Volley.newRequestQueue(getApplicationContext());
         cargarWSMovimientos();
         cargarWsCategorias();
-        cargarWsSubCategorias();
         cargarWsCuentas();
+        cargarWsRanking();
 
         recyclerPersonajes=findViewById(R.id.idListaMovimientos);
 
         recyclerPersonajes.setLayoutManager(new LinearLayoutManager(this));
 
-        //llenarMovimientos();
+
+        fab_ingreso.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IngresarMovimientos(1, null);
+            }
+        });
+
+        fab_pago.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IngresarMovimientos(0, null);
+            }
+        });
+
+        almanaque.setOnDateChangedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
+                Calendar fecha = calendarDay.getCalendar();
+
+                String d = fecha.get(Calendar.DAY_OF_MONTH) + "/" + (fecha.get(Calendar.MONTH)+1) + "/" + fecha.get(Calendar.YEAR);
+
+                filtroMovimiento.setFiltroPorFecha(true);
+                filtroMovimiento.setFechaInicial(d);
+                filtroMovimiento.setFechaFinal(d);
+
+                try {
+                    setFiltro(filtroMovimiento);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }
 
-    private void cargarWSMovimientos() {
+   /* private void cargarCheckbox() {
+        Drawable drawableFecha = resizeImage(getApplicationContext(), R.drawable.icono_fecha_checkbok,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
+        Drawable drawableFechaSelec = resizeImage(getApplicationContext(), R.drawable.icono_fecha_seleccionado_checkbok,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
 
-        String URL="http://utopiasoft.duckdns.org:8080/wscontrol/servicemovimientos.php?modo=L";
+        if(chkCalendario.isChecked()) {
+            chkCalendario.setCompoundDrawablesWithIntrinsicBounds(null, drawableFechaSelec, null, null);
+            layoutCalendario.setVisibility(View.VISIBLE);
 
-        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, URL, null, this,this);
+        }
+        else {
+            chkCalendario.setCompoundDrawablesWithIntrinsicBounds(null, drawableFecha, null, null);
+            layoutCalendario.setVisibility(View.GONE);
+        }
+    }*/
+
+    /*public Drawable resizeImage(Context ctx, int resId, int w, int h) {
+
+        // cargamos la imagen de origen
+        Bitmap BitmapOrg = BitmapFactory.decodeResource(ctx.getResources(),
+                resId);
+
+        int width = BitmapOrg.getWidth();
+        int height = BitmapOrg.getHeight();
+        int newWidth = (int)Math.round(w * getResources().getDisplayMetrics().density);
+        int newHeight = (int)Math.round(h * getResources().getDisplayMetrics().density);
+
+        // calculamos el escalado de la imagen destino
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        // para poder manipular la imagen
+        // debemos crear una matriz
+
+        Matrix matrix = new Matrix();
+        // resize the Bitmap
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // volvemos a crear la imagen con los nuevos valores
+        Bitmap resizedBitmap = Bitmap.createBitmap(BitmapOrg, 0, 0,
+                width, height, matrix, true);
+
+        // si queremos poder mostrar nuestra imagen tenemos que crear un
+        // objeto drawable y así asignarlo a un botón, imageview...
+        return new BitmapDrawable(resizedBitmap);
+
+    }*/
+
+    public void cargarWSMovimientos() {
+
+        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, CConeccion.URL_Listar_Movimientos + CConeccion.bd, null, this,this);
         request.add(jsonObjectRequest);
     }
 
     private void cargarWsCategorias(){
-        String URL="http://utopiasoft.duckdns.org:8080/wscontrol/servicecategorias.php?modo=L";
 
-        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, URL, null, this,this);
-        request.add(jsonObjectRequest);
-    }
-
-    private void cargarWsSubCategorias()
-    {
-        String URL="http://utopiasoft.duckdns.org:8080/wscontrol/servicesubcategorias.php?modo=L";
-
-        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, URL, null, this,this);
+        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, CConeccion.URL_Listar_Categorias + CConeccion.bd, null, this,this);
         request.add(jsonObjectRequest);
     }
 
     private void cargarWsCuentas()
     {
-        String URL="http://utopiasoft.duckdns.org:8080/wscontrol/servicecuentas.php?modo=L";
 
-        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, URL, null, this,this);
+        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, CConeccion.URL_Listar_Cuentas + CConeccion.bd, null, this,this);
+        request.add(jsonObjectRequest);
+    }
+
+    private void cargarWsRanking()
+    {
+        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, CConeccion.URL_Listar_Ranking + CConeccion.bd, null, this,this);
+        request.add(jsonObjectRequest);
+    }
+
+    private void eliminarWSMovimiento(int id, int idcuenta, double monto, boolean tipo)
+    {
+        int a = (tipo)?1:0;
+        String url= CConeccion.URL_Eliminar_Movimientos + CConeccion.bd + "&id=" + id + "&idcuenta=" + idcuenta + "&monto=" + monto + "&tipo=" + a;
+        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, url, null, this,this);
         request.add(jsonObjectRequest);
     }
 
@@ -144,17 +261,18 @@ public class activity_movimientos extends AppCompatActivity
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         CMovimiento mov = null;
         CCategorias cat = null;
-        CSubCategorias subcat=null;
         CCuenta cuent = null;
         int cboolean;
 
         JSONArray jsonCategorias = response.optJSONArray("categoriamodel");
-        JSONArray jsonSubCategorias= response.optJSONArray("subcategoriamodel");
         JSONArray jsonCuentas=response.optJSONArray("cuentasmodel");
         JSONArray jsonMovimientos = response.optJSONArray("movimientosmodel");
+        JSONArray jsonRanking = response.optJSONArray("Ranking");
+        JSONArray jsonEliminar= response.optJSONArray("resultado");
 
         try{
             if (jsonMovimientos!=null) {
+                listaMovimientos.clear();
                 for (int i = 0; i < jsonMovimientos.length(); i++) {
                     mov = new CMovimiento();
                     JSONObject jsonObject = null;
@@ -163,7 +281,6 @@ public class activity_movimientos extends AppCompatActivity
 
                     mov.setId(jsonObject.optInt("id"));
                     mov.setCategoria(jsonObject.optString("Categoria"));
-                    mov.setSubCategoria(jsonObject.optString("SubCategoria"));
                     mov.setCuenta(jsonObject.optString("Cuenta"));
                     mov.setMonto(jsonObject.optDouble("Monto"));
                     JSONObject jsonObjectFecha = jsonObject.getJSONObject("fecha");
@@ -174,13 +291,17 @@ public class activity_movimientos extends AppCompatActivity
                     mov.setDescripcion(jsonObject.optString("Descripcion"));
                     cboolean = (jsonObject.optInt("Tipo"));
                     mov.setIdCategoria(jsonObject.optInt("CategoriaId"));
-                    mov.setIdSubCategoria(jsonObject.optInt("SubCategoriaId"));
                     mov.setIdCuenta(jsonObject.optInt("CuentaId"));
+                    mov.setCatePadre(jsonObject.optString("CategoriaPadre"));
 
-                    if (cboolean == 1)
+                    if (cboolean == 1) {
                         mov.setTipo(true);
-                    else
+                        _totalIngreso += mov.getMonto();
+                    }
+                    else {
                         mov.setTipo(false);
+                        _totalEgreso += mov.getMonto();
+                    }
 
                     listaMovimientos.add(mov);
 
@@ -189,10 +310,21 @@ public class activity_movimientos extends AppCompatActivity
                     if (mov.getMonto() < _minimo)
                         _minimo = mov.getMonto();
 
-                    _total += mov.getMonto();
+
+                }
+
+                CargarTotales();
+
+                CargarAdapterRecyclerView();
+
+                try {
+                    setFiltro(filtroMovimiento);
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
             }
-            if(jsonCategorias!=null) {
+            else if(jsonCategorias!=null) {
+                listaCategorias.clear();
                 //Toast.makeText(getApplicationContext(), "HAY CATEGORIAS", Toast.LENGTH_LONG).show();
                 for (int i = 0; i < jsonCategorias.length(); i++) {
                     cat = new CCategorias();
@@ -201,40 +333,25 @@ public class activity_movimientos extends AppCompatActivity
 
                     cat.setId(jsonObject.optInt("Id"));
                     cat.setNombre(jsonObject.optString("Nombre"));
+                    int tipo = jsonObject.optInt("Tipo");
+                    if(tipo==1)
+                        cat.setTipo(true);
+                    else
+                        cat.setTipo(false);
+                    tipo = jsonObject.optInt("FijaMensualmente");
+                    if(tipo==1)
+                        cat.setFija(true);
+                    else
+                        cat.setFija(false);
+                    cat.setIdpadre(jsonObject.optInt("IdPadre"));
+                    cat.setMonto(jsonObject.optDouble("Monto"));
 
                     listaCategorias.add(cat);
                 }
             }
 
-            if(jsonSubCategorias!=null)
-            {
-                //Toast.makeText(getApplicationContext(), "HAY SUBCATEGORIAS", Toast.LENGTH_LONG).show();
-                for (int i = 0; i < jsonSubCategorias.length(); i++) {
-                    subcat = new CSubCategorias();
-                    JSONObject jsonObject = null;
-                    jsonObject = jsonSubCategorias.getJSONObject(i);
-
-                    subcat.setId(jsonObject.optInt("Id"));
-                    subcat.setNombre(jsonObject.optString("Nombre"));
-                    subcat.setIdCategoria(jsonObject.optInt("CategoriaId"));
-                    subcat.setCategoria(jsonObject.optString("Categoria"));
-                    subcat.setMonto((float)(jsonObject.optDouble("Monto")));
-                    int fija = jsonObject.optInt("FijaMensualmente");
-                    int tipo= jsonObject.optInt("Tipo");
-                    if(fija==1)
-                        subcat.setFija(true);
-                    else
-                        subcat.setFija(false);
-                    if(tipo==1)
-                        subcat.setTipo(true);
-                    else
-                        subcat.setTipo(false);
-
-                    listaSubCategorias.add(subcat);
-                }
-            }
-
-            if(jsonCuentas!=null) {
+            else if(jsonCuentas!=null) {
+                listaCuentas.clear();
                 //Toast.makeText(getApplicationContext(), "HAY CUENTAS", Toast.LENGTH_LONG).show();
                 for (int i = 0; i < jsonCuentas.length(); i++) {
                     cuent = new CCuenta();
@@ -248,6 +365,31 @@ public class activity_movimientos extends AppCompatActivity
                     listaCuentas.add(cuent);
                 }
             }
+            else if(jsonRanking!=null)
+            {
+                JSONObject jsonR= jsonRanking.getJSONObject(0);
+                _idCuenta = jsonR.optInt("idCuenta");
+                _idCategoriaIngreso = jsonR.optInt("idCategoriaIngreso");
+                _idCategoriaEgreso = jsonR.optInt("idCategoriaEgreso");
+
+            }
+            else if(jsonEliminar!=null)
+            {
+                JSONObject json = jsonEliminar.getJSONObject(0);
+                int resul= json.optInt("valor");
+                if(resul==1) {
+                    Toast.makeText(getApplicationContext(), "El registro se elimino satisfactoriamente!", Toast.LENGTH_SHORT).show();
+                    cargarWSMovimientos();
+                }
+                else
+                    Toast.makeText(getApplicationContext(),"El registro no se pudo eliminar!", Toast.LENGTH_SHORT).show();
+            }
+            /*else {
+                JSONObject jsonRanking= response.getJSONObject("Ranking");
+                _idCuenta = jsonRanking.optInt("idCuenta");
+                _idCategoriaIngreso = jsonRanking.optInt("idCategoriaIngreso");
+                _idCategoriaEgreso = jsonRanking.optInt("idCategoriaEgreso");
+            }*/
         }
         catch (JSONException e)
         {
@@ -256,27 +398,57 @@ public class activity_movimientos extends AppCompatActivity
             e.printStackTrace();
         }
 
+
+    }
+
+    private void CargarAdapterRecyclerView() {
         AdaptadorMovimientos adapter = new AdaptadorMovimientos(listaMovimientos);
 
         recyclerPersonajes.setAdapter(adapter);
+
+        adapter.setOnClickItemAdapterListener(new AdaptadorMovimientos.onClickItemAdapterListener() {
+            @Override
+            public void onItemDetalle(int id) {
+                Detalle(id); //Toast.makeText(getApplicationContext(), "has apretado en la posicion: " + position, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onItemEdita(int id) {
+                CMovimiento mov= DevolverMovimiento(id);
+                if(mov!=null) {
+                    if (mov.getTipo())
+                        IngresarMovimientos(1, mov);
+                    else
+                        IngresarMovimientos(0, mov);
+                }
+            }
+
+            @Override
+            public void onItemElimina(int id) {
+                CMovimiento mov = DevolverMovimiento(id);
+                eliminarWSMovimiento(mov.getId(),mov.getIdCuenta(),mov.getMonto(),mov.getTipo());
+            }
+        });
 
         recyclerPersonajes.addItemDecoration(
                 new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
     }
 
-    /*private void llenarMovimientos() {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        try {
-            listaMovimientos.add(new CMovimiento(1, formatter.parse("12/10/2018"), "Ventas", "Productos", "Caja", 100, "", "", true));
-            listaMovimientos.add(new CMovimiento(1, formatter.parse("13/10/2018"), "Mercaderia", "Almacen", "Caja", 150, "", "#Pan #cafe #facturas", false));
-            listaMovimientos.add(new CMovimiento(1, formatter.parse("14/10/2018"), "Mercaderia", "Chinos", "Caja", 200, "", "", false));
-            listaMovimientos.add(new CMovimiento(1, formatter.parse("14/10/2018"), "Gastos Fijos", "Luz", "Caja", 1600, "", "", false));
-            listaMovimientos.add(new CMovimiento(1, formatter.parse("14/10/2018"), "Gastos Fijos", "Telefono", "Caja", 700, "", "", false));
+    private void Detalle(int id) {
+        fragment_movimientos_detalle fDetalle= new fragment_movimientos_detalle(DevolverMovimiento(id));
+        fDetalle.show(this.getSupportFragmentManager(),"detalle");
+    }
+
+    private CMovimiento DevolverMovimiento(int id) {
+        CMovimiento mov=null;
+        for(CMovimiento movi: listaMovimientos)
+        {
+            if(movi.getId()==id)
+                return movi;
         }
-        catch (ParseException e) {
-            e.printStackTrace();
-        }
-    }*/
+        return mov;
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -288,12 +460,13 @@ public class activity_movimientos extends AppCompatActivity
         }
     }
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_movimientos, menu);
+        getMenuInflater().inflate(R.menu.mov_activity_toolbar, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -303,22 +476,10 @@ public class activity_movimientos extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_movimientos_ingresar) {
+        if (id == R.id.bar_movimientos_filtro) {
             FragmentManager fr =  getSupportFragmentManager();
-            fragment_movimientos_ingreso fragment_ingreso =  new fragment_movimientos_ingreso(listaMovimientos, listaCuentas, listaCategorias, listaSubCategorias);
+            fragment_movimientos_filtros fragment_filtro =  new fragment_movimientos_filtros(filtroMovimiento,_minimo,_maximo,isCalendario);
+            fragment_filtro.setCancelable(false);
 
             // The device is smaller, so show the fragment fullscreen
             FragmentTransaction transaction = fr.beginTransaction();
@@ -326,15 +487,59 @@ public class activity_movimientos extends AppCompatActivity
             transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             // To make it fullscreen, use the 'content' root view as the container
             // for the fragment, which is always the root view for the activity
-            transaction.add(android.R.id.content, fragment_ingreso)
+            transaction.add(android.R.id.content, fragment_filtro)
                     .addToBackStack(null).commit();
+            return true;
+        }
+        if (id==R.id.bar_movimientos_calendarioLista){
+                if(!isCalendario)
+                {
+                    isCalendario=true;
+                    item.setIcon(R.drawable.ic_movimientos_listarwhite);
+                    layoutCalendario.setVisibility(View.VISIBLE);
+                    BuscarTotales(listaMovimientos);
+                }
+                else
+                {
+                    isCalendario=false;
+                    layoutCalendario.setVisibility(View.GONE);
+                    filtroMovimiento.setFiltroPorFecha(false);
+                    filtroMovimiento.setFechaInicial(null);
+                    filtroMovimiento.setFechaFinal(null);
+                    try {
+                        setFiltro(filtroMovimiento);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    item.setIcon(R.drawable.ic_action_fecha);
+                    BuscarTotales(listaMovimientos);
+                }
+        }
 
-        } else if (id == R.id.nav_movimientos_actualizar) {
+        return super.onOptionsItemSelected(item);
+    }
 
-        } else if (id == R.id.nav_movimientos_eliminar) {
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
 
-        } else if (id == R.id.nav_movimientos_listar) {
+        if (id == R.id.nav_movimientos_ingreso) {
+            IngresarMovimientos(1, null);
 
+        } else if (id == R.id.nav_movimientos_pago) {
+            IngresarMovimientos(0, null);
+
+        }
+        else if(id==R.id.nav_cuentas){
+            Intent in= new Intent(this, activity_cuentas.class);
+            startActivity(in);
+            finish();
+        }
+        else if (id ==R.id.nav_salir){
+            BorrarUsuario();
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -345,7 +550,7 @@ public class activity_movimientos extends AppCompatActivity
 
     public void clickFiltro(View view) {
         FragmentManager fr =  getSupportFragmentManager();
-        fragment_movimientos_filtros fragment_filtro =  new fragment_movimientos_filtros(filtroMovimiento,_minimo,_maximo);
+        fragment_movimientos_filtros fragment_filtro =  new fragment_movimientos_filtros(filtroMovimiento,_minimo,_maximo,isCalendario);
         fragment_filtro.setCancelable(false);
 
         // The device is smaller, so show the fragment fullscreen
@@ -357,6 +562,27 @@ public class activity_movimientos extends AppCompatActivity
         transaction.add(android.R.id.content, fragment_filtro)
                 .addToBackStack(null).commit();
 
+    }
+
+    private void IngresarMovimientos(int tipo, CMovimiento mov)
+    {
+        FragmentManager fr =  getSupportFragmentManager();
+        fragment_movimientos_ingreso fragment_ingreso;
+        if(tipo==1)
+        {
+            fragment_ingreso = new fragment_movimientos_ingreso(tipo, listaMovimientos, listaCuentas, listaCategorias, _idCuenta, _idCategoriaIngreso, mov);
+        }
+        else {
+            fragment_ingreso = new fragment_movimientos_ingreso(tipo, listaMovimientos, listaCuentas, listaCategorias, _idCuenta, _idCategoriaEgreso, mov);
+        }
+        // The device is smaller, so show the fragment fullscreen
+        FragmentTransaction transaction = fr.beginTransaction();
+        // For a little polish, specify a transition animation
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        // To make it fullscreen, use the 'content' root view as the container
+        // for the fragment, which is always the root view for the activity
+        transaction.add(android.R.id.content, fragment_ingreso)
+                .addToBackStack(null).commit();
     }
 
     @Override
@@ -388,7 +614,14 @@ public class activity_movimientos extends AppCompatActivity
                 Collections.sort(listaMovimientosFiltrado, new Comparator<CMovimiento>() {
                     @Override
                     public int compare(CMovimiento o1, CMovimiento o2) {
-                        return o2.getFecha().compareTo(o1.getFecha());
+                        int result = o2.getFecha().compareTo(o1.getFecha());
+
+                        if (result != 0)
+                        {
+                            return result;
+                        }
+                        return String.valueOf(o2.getId()).compareTo(String.valueOf(o1.getId()));
+
                     }
                 });
                 break;
@@ -397,7 +630,12 @@ public class activity_movimientos extends AppCompatActivity
                 Collections.sort(listaMovimientosFiltrado, new Comparator<CMovimiento>() {
                     @Override
                     public int compare(CMovimiento o1, CMovimiento o2) {
-                        return o1.getFecha().compareTo(o2.getFecha());
+                        int result = o1.getFecha().compareTo(o2.getFecha());
+                        if (result != 0)
+                        {
+                            return result;
+                        }
+                        return String.valueOf(o1.getId()).compareTo(String.valueOf(o2.getId()));
                     }
                 });
                 break;
@@ -407,6 +645,9 @@ public class activity_movimientos extends AppCompatActivity
         AdaptadorMovimientos adapter = new AdaptadorMovimientos(listaMovimientosFiltrado);
 
         recyclerPersonajes.setAdapter(adapter);
+
+        BuscarTotales(listaMovimientosFiltrado);
+        CargarTotales();
     }
 
     private ArrayList<CMovimiento> filtrosRestantes(ArrayList<CMovimiento> listaMovimientosFiltrado, CFiltroMovimientos filtro) {
@@ -414,7 +655,7 @@ public class activity_movimientos extends AppCompatActivity
         String con="";
         CMovimiento movTemp = new CMovimiento();
 
-        if(filtro.getContenido()!=null || filtro.getContenido()!="")
+        if(!filtro.getContenido().isEmpty())
         {
             con=filtro.getContenido().toLowerCase();
         }
@@ -422,10 +663,10 @@ public class activity_movimientos extends AppCompatActivity
         for(CMovimiento mov: listaMovimientosFiltrado)
         {
             movTemp = mov;
+            //FILTRO POR CONTENIDO
             if(!con.isEmpty())
             {
                 if(mov.getCategoria().toLowerCase().contains(con) ||
-                        mov.getSubCategoria().contains(con) ||
                         mov.getHashtag().contains(con) ||
                         mov.getDescripcion().contains(con)||
                         mov.getCuenta().contains(con))
@@ -436,16 +677,17 @@ public class activity_movimientos extends AppCompatActivity
                     movTemp=null;
             }
 
+            //FILTRO POR MONTO
             if(movTemp!=null)
-                if((mov.getMonto()>=filtro.getMontoMinimo())&& (mov.getMonto()<=filtro.getMontoMaximo()))
-                {
-                    movTemp=mov;
-                }
-                else
-                {
-                    movTemp=null;
+                if(filtro.getMontoMinimo()!=null && filtro.getMontoMaximo()!=null) {
+                    if ((mov.getMonto() >= filtro.getMontoMinimo()) && (mov.getMonto() <= filtro.getMontoMaximo())) {
+                        movTemp = mov;
+                    } else {
+                        movTemp = null;
+                    }
                 }
 
+            //FILTRO POR TIPO
             if(movTemp!=null)
             {
                 if(filtro.getTipo()==0)
@@ -480,7 +722,6 @@ public class activity_movimientos extends AppCompatActivity
             for(CMovimiento mov: listaMovimientosFiltrado)
             {
                 if(mov.getCategoria().toLowerCase().contains(con) ||
-                    mov.getSubCategoria().contains(con) ||
                     mov.getHashtag().contains(con) ||
                     mov.getDescripcion().contains(con)||
                     mov.getCuenta().contains(con))
@@ -543,5 +784,63 @@ public class activity_movimientos extends AppCompatActivity
         filtroMovimiento.setFechaFinal(filtro.getFechaFinal());
         filtroMovimiento.setMontoMaximo(filtro.getMontoMaximo());
         filtroMovimiento.setMontoMinimo(filtro.getMontoMinimo());
+    }
+
+    private void BorrarUsuario() {
+
+        SharedPreferences pref = getSharedPreferences("login", MODE_PRIVATE);
+        SharedPreferences.Editor edit = pref.edit();
+
+        edit.putString("usuario", "");
+        edit.putString("password", "");
+
+        edit.commit();
+    }
+
+    private void BuscarTotales(List<CMovimiento> lista){
+        _totalEgreso=0.0;
+        _totalIngreso=0.0;
+
+        for(CMovimiento mov:lista)
+        {
+            if(mov.getTipo())
+                _totalIngreso +=mov.getMonto();
+            else
+                _totalEgreso +=mov.getMonto();
+        }
+    }
+
+    private void CargarTotales(){
+        Double total= _totalIngreso-_totalEgreso;
+        txtIngreso.setText("INGRESO: " + Double.toString(_totalIngreso));
+        txtEgreso.setText("EGRESO : " + Double.toString(_totalEgreso));
+        txtTotales.setText("TOTAL  : " + Double.toString(total));
+
+        //viewTotales.setLayoutParams(new TableLayout.LayoutParams(txtTotales.getMinimumWidth(),2));
+    }
+
+    public void LimpiarFiltro() throws ParseException {
+        filtroMovimiento.setFecha(0);
+        filtroMovimiento.setContenido("");
+        filtroMovimiento.setFiltroPorFecha(false);
+        filtroMovimiento.setTipo(0);
+        filtroMovimiento.setMontoMinimo(new Double(_minimo));
+        filtroMovimiento.setMontoMaximo(new Double(_maximo));
+        filtroMovimiento.setFechaInicial(FechaNow());
+        filtroMovimiento.setFechaFinal(FechaNow());
+
+        setFiltro(filtroMovimiento);
+    }
+
+    private String FechaNow()
+    {
+        calendario = Calendar.getInstance();
+
+        int month = calendario.get(Calendar.MONTH) + 1;
+        int day = calendario.get(Calendar.DAY_OF_MONTH);
+        int year= calendario.get(Calendar.YEAR);
+
+        return Integer.toString(day) + "/" + Integer.toString(month) + "/" + Integer.toString(year);
+
     }
 }

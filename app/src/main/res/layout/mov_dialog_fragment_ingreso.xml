@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Movimientos.fragment_movimientos_ingreso"
+    android:background="@color/colorForeBlanco">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:id="@+id/ScrollIngreso">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="vertical">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
+
+                <ImageButton
+                    android:id="@+id/btnClose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btnrecyclerview"
+                    android:src="@drawable/ic_action_close" />
+
+                <Button
+                    android:id="@+id/btn_aplicar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    android:background="@drawable/btnrecyclerview"
+                    android:text="@string/btn_filtrar_aplicar"
+                    android:textColor="@color/colorForeFiltro"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:layout_editor_absoluteY="0dp" />
+            </android.support.constraint.ConstraintLayout>
+
+
+
+
+            <!-- *************************** -->
+            <!-- INGRESAR FECHA -->
+            <!-- ENCABEZADO -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/movimiento_campo_fecha"
+                    android:textColor="@color/colorForeFiltro"
+                    android:textSize="10sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+            </LinearLayout>
+
+            <!-- *************************** -->
+            <!-- INGRESAR FECHA -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/movimiento_campo_fecha"
+                    android:textColor="@color/colorForeFiltro"
+                    android:textSize="12sp"
+                    android:layout_gravity="center"/>
+
+                <Button
+                    android:id="@+id/btn_fecha"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:background="@drawable/btnrecyclerview"
+                    android:textColor="@color/colorForeFiltro"
+                    android:textSize="12sp"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+            <!-- *************************** -->
+            <!-- INGRESAR CUENTA -->
+            <!-- ENCABEZADO -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/movimiento_campo_cuenta"
+                    android:textColor="@color/colorForeFiltro"
+                    android:textSize="10sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+            </LinearLayout>
+
+            <!-- *************************** -->
+            <!-- INGRESAR CUENTA -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp">
+
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:id="@+id/cboCuenta"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"
+                    style="@style/miSpinner">
+
+                </Spinner>
+
+            </LinearLayout>
+
+
+            <!-- *************************** -->
+            <!-- INGRESAR CATEGORIA -->
+            <!-- ENCABEZADO -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/movimiento_campo_categoria"
+                    android:textColor="@color/colorForeFiltro"
+                    android:textSize="10sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+            </LinearLayout>
+
+            <!-- *************************** -->
+            <!-- INGRESAR CATEGORIA -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/btnrecyclerview"
+                    android:textColor="@color/colorForeFiltro"
+                    android:id="@+id/btnCategorias"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"/>
+
+                <!--<Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="10dp"
+                    android:id="@+id/cboCategoria"
+                    style="@style/miSpinner">
+
+                </Spinner>-->
+
+            </LinearLayout>
+
+            <!-- *************************** -->
+            <!-- INGRESAR MONTO -->
+            <!-- ENCABEZADO -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/movimiento_campo_monto"
+                    android:textColor="@color/colorForeFiltro"
+                    android:textSize="10sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+            </LinearLayout>
+
+            <!-- *************************** -->
+            <!-- INGRESAR MONTO -->
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:hint="@string/movimiento_campo_monto_hint"
+                android:textColorHint="@color/colorPrimaryDarkAlpha"
+                android:layout_gravity="center">
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:inputType="numberDecimal"
+                    android:textSize="12sp"
+                    android:textAlignment="textEnd"
+                    android:id="@+id/txtMonto"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+
+            <!-- *************************** -->
+            <!-- INGRESAR HASHTAG -->
+            <!-- ENCABEZADO -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/movimiento_campo_hashtag"
+                    android:textColor="@color/colorForeFiltro"
+                    android:textSize="10sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+            </LinearLayout>
+
+            <!-- *************************** -->
+            <!-- INGRESAR HASHTAG -->
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:hint="@string/movimiento_campo_hashtag_hint"
+                android:textColorHint="@color/colorPrimaryDarkAlpha"
+                android:layout_gravity="center">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/txthashtag"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:inputType="textMultiLine"
+                    android:textSize="12sp"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <!-- *************************** -->
+            <!-- INGRESAR DESCRIPCION -->
+            <!-- ENCABEZADO -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/movimiento_campo_descripcion"
+                    android:textColor="@color/colorForeFiltro"
+                    android:textSize="10sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/filtro_grosor_de_linea"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/separador" />
+
+            </LinearLayout>
+
+            <!-- *************************** -->
+            <!-- INGRESAR DESCRIPCION -->
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="@string/movimiento_campo_descripcion_hint"
+                android:textColorHint="@color/colorPrimaryDarkAlpha"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp">
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:inputType="textMultiLine"
+                    android:textSize="12sp"
+                    android:id="@+id/txtDescripcion"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>
