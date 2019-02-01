@@ -1,19 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/bar_movimientos_calendarioMesLista"
+        android:icon="@drawable/ic_action_fecha_mes"
+        app:showAsAction="always"
+        android:tooltipText="Mes"></item>
 
     <item android:id="@+id/bar_movimientos_calendarioLista"
         android:icon="@drawable/ic_action_fecha"
         app:showAsAction="always"
-        android:tooltipText="@string/movimiento_calendario_lista"
-        >
+        android:tooltipText="@string/movimiento_calendario_lista"></item>
 
-    </item>
 
     <item android:id="@+id/bar_movimientos_filtro"
         android:icon="@drawable/ic_action_filtro"
         app:showAsAction="always"
         android:tooltipText="@string/movimiento_filtro"
         ></item>
+
+    <item
+        android:id="@+id/bar_movimientos_cerrarchecked"
+        android:icon="@android:drawable/ic_menu_revert"
+        android:tooltipText="Sacar filtro"
+        android:visible="false"
+        app:showAsAction="always"></item>
+
+    <item
+        android:id="@+id/bar_movimientos_borrar"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:tooltipText="Borrar Seleccionados"
+        android:visible="false"
+        app:showAsAction="always"></item>
+
+    <item
+        android:id="@+id/bar_movimientos_filtraporchecked"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:tooltipText="Filtrar seleccionados"
+        android:visible="false"
+        app:showAsAction="always"></item>
 
 </menu>

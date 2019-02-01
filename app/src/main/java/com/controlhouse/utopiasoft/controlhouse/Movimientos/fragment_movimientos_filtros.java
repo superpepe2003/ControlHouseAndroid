@@ -350,7 +350,7 @@ public class fragment_movimientos_filtros extends DialogFragment {
 
     public void LimpiarFiltro()
     {
-        filtro.setFecha(0);
+        filtro.setFecha(1);
         filtro.setContenido("");
         filtro.setFiltroPorFecha(false);
         filtro.setTipo(0);

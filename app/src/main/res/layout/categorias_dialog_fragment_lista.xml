@@ -3,15 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Movimientos.fragment_lista_categorias"
+    tools:context=".Categorias.fragment_lista_categorias"
     android:orientation="vertical"
-    android:background="@color/colorPrimaryLight">
+    android:background="@color/colorPrimaryLight"
+    android:id="@+id/idFragmentListaCategorias">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="10dp"
+        android:id="@+id/llCabeceraBotones">
         <ImageButton
             android:id="@+id/btnClose"
             android:layout_width="wrap_content"

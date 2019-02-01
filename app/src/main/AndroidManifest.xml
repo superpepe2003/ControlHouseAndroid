@@ -30,6 +30,10 @@
         <activity
             android:name=".Cuentas.activity_cuentas"
             android:label="@string/title_activity_cuentas"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Categorias.activity_categorias"
+            android:label="@string/title_activity_categorias"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

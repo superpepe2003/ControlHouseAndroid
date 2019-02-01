@@ -14,9 +14,16 @@ public class CConeccion {
     public static String URL_Eliminar_Movimientos = "http://utopiasoft.duckdns.org:8080/wscontrol/servicemovimientos.php?modo=R";
 
     public static String URL_Listar_Cuentas = "http://utopiasoft.duckdns.org:8080/wscontrol/servicecuentas.php?modo=L";
+    public static String URL_Ingresar_Cuentas="http://utopiasoft.duckdns.org:8080/wscontrol/servicecuentas.php?modo=C";
+    public static String URL_Modificar_Cuentas="http://utopiasoft.duckdns.org:8080/wscontrol/servicecuentas.php?modo=U";
+    public static String Url_Eliminar_Cuentas="http://utopiasoft.duckdns.org:8080/wscontrol/servicecuentas.php?modo=R";
+
+    public static String Url_Listar_Transacciones="http://utopiasoft.duckdns.org:8080/wscontrol/servicetransacciones.php?modo=L";
+    public static String Url_Ingresar_Transacciones="http://utopiasoft.duckdns.org:8080/wscontrol/servicetransacciones.php?modo=C";
 
     public static String URL_Listar_Categorias = "http://utopiasoft.duckdns.org:8080/wscontrol/servicecategorias.php?modo=L";
     public static String URL_Ingresar_Categorias = "http://utopiasoft.duckdns.org:8080/wscontrol/servicecategorias.php?modo=C";
+    public static String URL_Eliminar_Categorias = "http://utopiasoft.duckdns.org:8080/wscontrol/servicecategorias.php?modo=R";
 
     public static String URL_Listar_Ranking = "http://utopiasoft.duckdns.org:8080/wscontrol/servicemovimientos.php?modo=conta";
 

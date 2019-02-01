@@ -33,6 +33,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.controlhouse.utopiasoft.controlhouse.Categorias.fragment_lista_categorias;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CCategorias;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CConeccion;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CCuenta;
@@ -207,9 +208,22 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
         btnCategorias.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragment_lista_categorias frg = new fragment_lista_categorias(listaCategorias, -1, tipo,true);
-                frg.setTargetFragment(fragment_movimientos_ingreso.this,1);
+                fragment_lista_categorias frg = new fragment_lista_categorias(listaCategorias,-1, tipo,0);
+                //frg.setTargetFragment(fragment_movimientos_ingreso.this,1);
                 frg.show(getActivity().getSupportFragmentManager(), "dialogListaCategoria");
+                frg.setOnClickListCategoriaListener(new fragment_lista_categorias.onClickListCategoriaListener() {
+                    @Override
+                    public void onItemClick(int id, String nombre) {
+                        if(id>-3) {
+                            cateId=id;
+                            btnCategorias.setText(nombre);
+                        }
+                       /* else if((id==-1)||(id==-2)) {
+                            cateId = -1;
+                            btnCategorias.setText("Otros");
+                        }*/
+                    }
+                });
             }
         });
 
@@ -229,7 +243,7 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
         btnCategorias.setText(getCategoriaId(movModifica.getIdCategoria()));
     }
 
-    @Override
+    /*@Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==1)
@@ -240,7 +254,7 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
                 btnCategorias.setText(getCategoriaId(cateId));
             }
         }
-    }
+    }*/
 
     public String getCategoriaId(int id)
     {
@@ -551,7 +565,7 @@ public class fragment_movimientos_ingreso extends DialogFragment implements Resp
         txtDescripcion.setText("");
         txtHashtag.setText("");
         txtMonto.setText("");
-        btnFecha.setText(fechaNow());
+        //btnFecha.setText(fechaNow());
     }
 }
 

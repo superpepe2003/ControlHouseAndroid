@@ -16,6 +16,15 @@ import java.util.List;
 
 public class AdaptadorCuentas extends RecyclerView.Adapter<AdaptadorCuentas.HolderCuentas> {
     List<CCuenta> listCuentas;
+    OnItemButtonClick listener;
+
+    public interface OnItemButtonClick{
+        void onItemEdita(int id);
+        void onItemDetalla(int id);
+        void onItemElimina(int id);
+    }
+
+    public void setOnItemButtonClick(OnItemButtonClick onItemButtonClick){listener=onItemButtonClick;}
 
 
     public AdaptadorCuentas(List<CCuenta> listCuentas)
@@ -29,7 +38,7 @@ public class AdaptadorCuentas extends RecyclerView.Adapter<AdaptadorCuentas.Hold
         View view= LayoutInflater.from(viewGroup.getContext()).
                 inflate(R.layout.cuentas_item_list,null, false);
 
-        return new HolderCuentas(view);
+        return new HolderCuentas(view, listener);
     }
 
     @Override
@@ -50,7 +59,7 @@ public class AdaptadorCuentas extends RecyclerView.Adapter<AdaptadorCuentas.Hold
         ImageButton btnEdit, btnDetalle, btnEliminar;
 
 
-        public HolderCuentas(@NonNull View itemView) {
+        public HolderCuentas(@NonNull View itemView, final OnItemButtonClick listener) {
 
             super(itemView);
             txtcuentas=itemView.findViewById(R.id.txtNombre);
@@ -58,6 +67,42 @@ public class AdaptadorCuentas extends RecyclerView.Adapter<AdaptadorCuentas.Hold
             btnDetalle=itemView.findViewById(R.id.btn_detalle);
             btnEliminar=itemView.findViewById(R.id.btn_eliminar);
             btnEdit=itemView.findViewById(R.id.btn_editar);
+
+            btnEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if(position!=RecyclerView.NO_POSITION)
+                    {
+                        int id= listCuentas.get(position).getId();
+                        listener.onItemEdita(id);
+                    }
+                }
+            });
+
+            btnEliminar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view){
+                    int position= getAdapterPosition();
+                    if(position!=RecyclerView.NO_POSITION)
+                    {
+                        int id= listCuentas.get(position).getId();
+                        listener.onItemElimina(id);
+                    }
+                }
+            });
+
+            btnDetalle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position=getAdapterPosition();
+                    if(position!=RecyclerView.NO_POSITION)
+                    {
+                        int id= listCuentas.get(position).getId();
+                        listener.onItemDetalla(id);
+                    }
+                }
+            });
         }
     }
 }

@@ -7,13 +7,13 @@
         <menu>
             <group android:checkableBehavior="single">
                 <item
-                    android:id="@+id/nav_cuentas_nueva"
+                    android:id="@+id/nav_categoria_ingreso"
                     android:icon="@drawable/ic_action_add"
-                    android:title="@string/nav_cuentas_nuevas" />
+                    android:title="@string/nav_categorias_ingreso" />
                 <item
-                    android:id="@+id/nav_cuentas_transacciones"
-                    android:icon="@drawable/ic_movimientos_listar"
-                    android:title="@string/nav_cuentas_transacciones" />
+                    android:id="@+id/nav_categoria_egreso"
+                    android:icon="@drawable/ic_action_sub"
+                    android:title="@string/nav_categorias_egreso" />
             </group>
         </menu>
     </item>

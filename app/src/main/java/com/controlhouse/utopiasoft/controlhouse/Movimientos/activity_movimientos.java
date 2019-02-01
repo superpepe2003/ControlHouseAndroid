@@ -1,5 +1,6 @@
 package com.controlhouse.utopiasoft.controlhouse.Movimientos;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +21,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +31,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.controlhouse.utopiasoft.controlhouse.Categorias.activity_categorias;
 import com.controlhouse.utopiasoft.controlhouse.Cuentas.activity_cuentas;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CCategorias;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CConeccion;
@@ -36,6 +40,7 @@ import com.controlhouse.utopiasoft.controlhouse.Entidades.CFiltroMovimientos;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CMovimiento;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.IFiltro;
 import com.controlhouse.utopiasoft.controlhouse.R;
+import com.controlhouse.utopiasoft.controlhouse.Utilidades.DatePickerSinDia;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
@@ -45,6 +50,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,6 +60,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import static java.lang.Math.round;
+
 public class activity_movimientos extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Response.Listener<JSONObject>, Response.ErrorListener, IFiltro {
 
@@ -61,6 +69,8 @@ public class activity_movimientos extends AppCompatActivity
     ArrayList<CCategorias> listaCategorias;
     ArrayList<CCuenta> listaCuentas;
     RecyclerView recyclerPersonajes;
+
+    MenuItem toolbarbtnCalendar, toolbarbtnFiltro, toolbarbtnChk, toolbarbtnfiltrochk, toolbarbtnBorrar, toolbarbtnCalendarMes;
 
     RequestQueue request;
     JsonObjectRequest jsonObjectRequest;
@@ -80,9 +90,10 @@ public class activity_movimientos extends AppCompatActivity
 
     //Si esta o no el calendario
     Calendar calendario;
-    boolean isCalendario;
+    boolean isCalendario, isMes;
     ConstraintLayout layoutCalendario;
-    MaterialCalendarView almanaque;
+    //MaterialCalendarView almanaque;
+    Button btnElijeFechaoMes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,8 +102,8 @@ public class activity_movimientos extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-        almanaque = findViewById(R.id.calendario);
+        btnElijeFechaoMes= findViewById(R.id.btnElijeFechaoMes);
+        //almanaque = findViewById(R.id.calendario);
 
         isCalendario=false;
         _minimo=0.0;
@@ -107,9 +118,10 @@ public class activity_movimientos extends AppCompatActivity
         txtEgreso=findViewById(R.id.txtEgreso);
         txtIngreso=findViewById(R.id.txtIngreso);
 
-        layoutCalendario=findViewById(R.id.linearLayout5);
+        layoutCalendario=findViewById(R.id.linearLayout6);
+        //layoutCalendarioMes=findViewById(R.id.linearLayout6);
 
-        //cargarCheckbox();
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -149,7 +161,46 @@ public class activity_movimientos extends AppCompatActivity
             }
         });
 
-        almanaque.setOnDateChangedListener(new OnDateSelectedListener() {
+        btnElijeFechaoMes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int d = 0;
+                int m = 0;
+                int y = 0;
+                try {
+                    SimpleDateFormat dfFecha;
+                    if(isMes)
+                        dfFecha= new SimpleDateFormat("MM/yyyy");
+                    else
+                        dfFecha= new SimpleDateFormat("dd/MM/yyyy");
+                    SimpleDateFormat dfDia = new SimpleDateFormat("dd");
+                    SimpleDateFormat dfMes= new SimpleDateFormat("MM");
+                    SimpleDateFormat dfAnio=new SimpleDateFormat("yyyy");
+                    if(!isMes)
+                        d = Integer.parseInt(dfDia.format(dfFecha.parse(btnElijeFechaoMes.getText().toString())));
+                    m = Integer.parseInt(dfMes.format(dfFecha.parse(btnElijeFechaoMes.getText().toString())));
+                    y = Integer.parseInt(dfAnio.format(dfFecha.parse(btnElijeFechaoMes.getText().toString())));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                DatePickerSinDia datePicker= new DatePickerSinDia(isMes, d,m,y);
+                datePicker.setOnDateChangeListener(new DatePickerSinDia.OnDateChangeListener() {
+                    @Override
+                    public void onDateChange(int year, int month, int day) {
+                        if(isCalendario)
+                            btnElijeFechaoMes.setText(day + "/" + (month +1) + "/" + year);
+                        else
+                            btnElijeFechaoMes.setText((month +1) + "/" + year);
+                        FiltrarxCalendarios(year,month + 1,day);
+                    }
+                });
+                datePicker.show(getSupportFragmentManager(),"elijeFechaoMes");
+            }
+        });
+
+        /*almanaque.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
                 Calendar fecha = calendarDay.getCalendar();
@@ -166,56 +217,54 @@ public class activity_movimientos extends AppCompatActivity
                     e.printStackTrace();
                 }
             }
-        });
+        });*/
 
     }
 
-   /* private void cargarCheckbox() {
-        Drawable drawableFecha = resizeImage(getApplicationContext(), R.drawable.icono_fecha_checkbok,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
-        Drawable drawableFechaSelec = resizeImage(getApplicationContext(), R.drawable.icono_fecha_seleccionado_checkbok,(int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)), (int)Math.round(getResources().getDimension(R.dimen.icono_filtrar)));
-
-        if(chkCalendario.isChecked()) {
-            chkCalendario.setCompoundDrawablesWithIntrinsicBounds(null, drawableFechaSelec, null, null);
-            layoutCalendario.setVisibility(View.VISIBLE);
-
+    private void FiltrarxCalendarios(int year, int month, int day) {
+        String d1,d2;
+        if(isCalendario) {
+            d1 = day + "/" + month + "/" + year;
+            d2 = d1;
         }
-        else {
-            chkCalendario.setCompoundDrawablesWithIntrinsicBounds(null, drawableFecha, null, null);
-            layoutCalendario.setVisibility(View.GONE);
+        else
+        {
+            Calendar calFin = Calendar.getInstance();
+            calFin.set(year, month, 1);
+            calFin.set(year, month, calFin.getActualMaximum(Calendar.DAY_OF_MONTH));
+            int DiaFin = calFin.get(Calendar.DAY_OF_MONTH);
+
+            d1= 1+ "/" + month + "/" + year;
+            d2= DiaFin + "/" + month + "/" + year;
         }
-    }*/
+        filtroMovimiento.setFiltroPorFecha(true);
+        filtroMovimiento.setFechaInicial(d1);
+        filtroMovimiento.setFechaFinal(d2);
 
-    /*public Drawable resizeImage(Context ctx, int resId, int w, int h) {
+        try {
+            setFiltro(filtroMovimiento);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
 
-        // cargamos la imagen de origen
-        Bitmap BitmapOrg = BitmapFactory.decodeResource(ctx.getResources(),
-                resId);
-
-        int width = BitmapOrg.getWidth();
-        int height = BitmapOrg.getHeight();
-        int newWidth = (int)Math.round(w * getResources().getDisplayMetrics().density);
-        int newHeight = (int)Math.round(h * getResources().getDisplayMetrics().density);
-
-        // calculamos el escalado de la imagen destino
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-
-        // para poder manipular la imagen
-        // debemos crear una matriz
-
-        Matrix matrix = new Matrix();
-        // resize the Bitmap
-        matrix.postScale(scaleWidth, scaleHeight);
-
-        // volvemos a crear la imagen con los nuevos valores
-        Bitmap resizedBitmap = Bitmap.createBitmap(BitmapOrg, 0, 0,
-                width, height, matrix, true);
-
-        // si queremos poder mostrar nuestra imagen tenemos que crear un
-        // objeto drawable y así asignarlo a un botón, imageview...
-        return new BitmapDrawable(resizedBitmap);
-
-    }*/
+    private void CargarParaFiltrarCalendarios(){
+        String []fech= btnElijeFechaoMes.getText().toString().split("/");
+        int d=0;
+        int m=0;
+        int y=0;
+        if(!isMes){
+            d=Integer.parseInt(fech[0]);
+            m=Integer.parseInt(fech[1]);
+            y=Integer.parseInt(fech[2]);
+        }
+        else
+        {
+            m=Integer.parseInt(fech[0]);
+            y=Integer.parseInt(fech[1]);
+        }
+        FiltrarxCalendarios(y,m,d);
+    }
 
     public void cargarWSMovimientos() {
 
@@ -292,7 +341,10 @@ public class activity_movimientos extends AppCompatActivity
                     cboolean = (jsonObject.optInt("Tipo"));
                     mov.setIdCategoria(jsonObject.optInt("CategoriaId"));
                     mov.setIdCuenta(jsonObject.optInt("CuentaId"));
-                    mov.setCatePadre(jsonObject.optString("CategoriaPadre"));
+                    String catePadre=jsonObject.optString("CategoriaPadre");
+                    if((catePadre==null)||(catePadre.isEmpty())||(catePadre.equals("null")))
+                        catePadre="";
+                    mov.setCatePadre(catePadre);
 
                     if (cboolean == 1) {
                         mov.setTipo(true);
@@ -310,6 +362,7 @@ public class activity_movimientos extends AppCompatActivity
                     if (mov.getMonto() < _minimo)
                         _minimo = mov.getMonto();
 
+                    mov.setChecked(false);
 
                 }
 
@@ -402,7 +455,7 @@ public class activity_movimientos extends AppCompatActivity
     }
 
     private void CargarAdapterRecyclerView() {
-        AdaptadorMovimientos adapter = new AdaptadorMovimientos(listaMovimientos);
+        AdaptadorMovimientos adapter = new AdaptadorMovimientos(listaMovimientos,false);
 
         recyclerPersonajes.setAdapter(adapter);
 
@@ -424,9 +477,48 @@ public class activity_movimientos extends AppCompatActivity
             }
 
             @Override
-            public void onItemElimina(int id) {
-                CMovimiento mov = DevolverMovimiento(id);
-                eliminarWSMovimiento(mov.getId(),mov.getIdCuenta(),mov.getMonto(),mov.getTipo());
+            public void onItemElimina(final int id) {
+
+                AlertDialog.Builder dialog = new AlertDialog.Builder(activity_movimientos.this, R.style.MyAlertDialogStyle);
+                dialog.setTitle("Confirmar");
+                dialog.setMessage("¿Desea Eliminar el movimiento?");
+                dialog.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        CMovimiento mov = DevolverMovimiento(id);
+                        eliminarWSMovimiento(mov.getId(),mov.getIdCuenta(),mov.getMonto(),mov.getTipo());
+                    }
+                });
+                dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                dialog.show();
+            }
+
+            //Selecciono algun checked
+            @Override
+            public void onItemSelecciona(ArrayList<CMovimiento> listMovi) {
+                listaMovimientosFiltrado=listMovi;
+            }
+
+            //Apreto para que aparezcan los checked
+            @Override
+            public void onSelecciona() {
+                if(!toolbarbtnChk.isVisible()) {
+                    AdaptadorMovimientos adapter = new AdaptadorMovimientos(listaMovimientosFiltrado, true);
+
+                    recyclerPersonajes.setAdapter(adapter);
+
+                    toolbarbtnCalendar.setVisible(false);
+                    toolbarbtnCalendarMes.setVisible(false);
+                    toolbarbtnChk.setVisible(true);
+                    toolbarbtnFiltro.setVisible(false);
+                    toolbarbtnfiltrochk.setVisible(true);
+                    toolbarbtnBorrar.setVisible(true);
+                }
             }
         });
 
@@ -464,6 +556,14 @@ public class activity_movimientos extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.mov_activity_toolbar, menu);
+
+        toolbarbtnFiltro= menu.findItem(R.id.bar_movimientos_filtro);
+        toolbarbtnChk=menu.findItem(R.id.bar_movimientos_cerrarchecked);
+        toolbarbtnCalendar=menu.findItem(R.id.bar_movimientos_calendarioLista);
+        toolbarbtnCalendarMes= menu.findItem(R.id.bar_movimientos_calendarioMesLista);
+        toolbarbtnBorrar=menu.findItem(R.id.bar_movimientos_borrar);
+        toolbarbtnfiltrochk=menu.findItem(R.id.bar_movimientos_filtraporchecked);
+
         return true;
     }
 
@@ -478,7 +578,7 @@ public class activity_movimientos extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.bar_movimientos_filtro) {
             FragmentManager fr =  getSupportFragmentManager();
-            fragment_movimientos_filtros fragment_filtro =  new fragment_movimientos_filtros(filtroMovimiento,_minimo,_maximo,isCalendario);
+            fragment_movimientos_filtros fragment_filtro =  new fragment_movimientos_filtros(filtroMovimiento,_minimo,_maximo,(isCalendario || isMes));
             fragment_filtro.setCancelable(false);
 
             // The device is smaller, so show the fragment fullscreen
@@ -491,17 +591,21 @@ public class activity_movimientos extends AppCompatActivity
                     .addToBackStack(null).commit();
             return true;
         }
-        if (id==R.id.bar_movimientos_calendarioLista){
+        else if (id==R.id.bar_movimientos_calendarioLista){
                 if(!isCalendario)
                 {
                     isCalendario=true;
                     item.setIcon(R.drawable.ic_movimientos_listarwhite);
+                    btnElijeFechaoMes.setText(ponerFechaenBoton());
                     layoutCalendario.setVisibility(View.VISIBLE);
+                    CargarParaFiltrarCalendarios();
                     BuscarTotales(listaMovimientos);
+                    toolbarbtnCalendarMes.setVisible(false);
                 }
                 else
                 {
                     isCalendario=false;
+                    toolbarbtnCalendarMes.setVisible(true);
                     layoutCalendario.setVisibility(View.GONE);
                     filtroMovimiento.setFiltroPorFecha(false);
                     filtroMovimiento.setFechaInicial(null);
@@ -515,8 +619,75 @@ public class activity_movimientos extends AppCompatActivity
                     BuscarTotales(listaMovimientos);
                 }
         }
+        else if(id==R.id.bar_movimientos_calendarioMesLista)
+        {
+            if(!isMes)
+            {
+                isMes=true;
+                toolbarbtnCalendar.setVisible(false);
+                item.setIcon(R.drawable.ic_movimientos_listarwhite);
+                btnElijeFechaoMes.setText(ponerFechaenBoton());
+                layoutCalendario.setVisibility(View.VISIBLE);
+                CargarParaFiltrarCalendarios();
+                //filtroxMes();
+                BuscarTotales(listaMovimientos);
+            }
+            else
+            {
+                isMes=false;
+                toolbarbtnCalendar.setVisible(true);
+                layoutCalendario.setVisibility(View.GONE);
+                filtroMovimiento.setFiltroPorFecha(false);
+                filtroMovimiento.setFechaInicial(null);
+                filtroMovimiento.setFechaFinal(null);
+                try {
+                    setFiltro(filtroMovimiento);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                item.setIcon(R.drawable.ic_action_fecha_mes);
+                BuscarTotales(listaMovimientos);
+            }
+        }
+        else if(id==R.id.bar_movimientos_cerrarchecked){
+            try {
+                setFiltro(filtroMovimiento);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            /*AdaptadorMovimientos adapter = new AdaptadorMovimientos(listaMovimientos,false);
+
+            recyclerPersonajes.setAdapter(adapter);*/
+
+            toolbarbtnCalendar.setVisible(true);
+            toolbarbtnCalendarMes.setVisible(true);
+            toolbarbtnChk.setVisible(false);
+            toolbarbtnFiltro.setVisible(true);
+            toolbarbtnfiltrochk.setVisible(false);
+            toolbarbtnBorrar.setVisible(false);
+        }
+        else if(id==R.id.bar_movimientos_borrar){
+
+        }
+        else if(id==R.id.bar_movimientos_filtraporchecked)
+        {
+            FiltrarPorChecked();
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private String ponerFechaenBoton() {
+        calendario = Calendar.getInstance();
+
+        int month = calendario.get(Calendar.MONTH) + 1;
+        int day = calendario.get(Calendar.DAY_OF_MONTH);
+        int year= calendario.get(Calendar.YEAR);
+
+        if(isCalendario)
+            return Integer.toString(day) + "/" + Integer.toString(month) + "/" + Integer.toString(year);
+        else
+            return Integer.toString(month) + "/" + Integer.toString(year);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -534,6 +705,12 @@ public class activity_movimientos extends AppCompatActivity
         }
         else if(id==R.id.nav_cuentas){
             Intent in= new Intent(this, activity_cuentas.class);
+            startActivity(in);
+            finish();
+        }
+        else if(id==R.id.nav_categoria)
+        {
+            Intent in= new Intent(this, activity_categorias.class);
             startActivity(in);
             finish();
         }
@@ -642,11 +819,28 @@ public class activity_movimientos extends AppCompatActivity
             }
         }
 
-        AdaptadorMovimientos adapter = new AdaptadorMovimientos(listaMovimientosFiltrado);
+        AdaptadorMovimientos adapter = new AdaptadorMovimientos(listaMovimientosFiltrado, false);
 
         recyclerPersonajes.setAdapter(adapter);
 
         BuscarTotales(listaMovimientosFiltrado);
+        CargarTotales();
+    }
+
+    private void FiltrarPorChecked()
+    {
+        ArrayList<CMovimiento> lTemp= new ArrayList<>();
+        for(CMovimiento mov:listaMovimientosFiltrado)
+        {
+            if(mov.getChecked())
+                lTemp.add(mov);
+        }
+
+        AdaptadorMovimientos adapter = new AdaptadorMovimientos(lTemp, false);
+
+        recyclerPersonajes.setAdapter(adapter);
+
+        BuscarTotales(lTemp);
         CargarTotales();
     }
 
@@ -667,9 +861,10 @@ public class activity_movimientos extends AppCompatActivity
             if(!con.isEmpty())
             {
                 if(mov.getCategoria().toLowerCase().contains(con) ||
-                        mov.getHashtag().contains(con) ||
-                        mov.getDescripcion().contains(con)||
-                        mov.getCuenta().contains(con))
+                        mov.getHashtag().toLowerCase().contains(con) ||
+                        mov.getDescripcion().toLowerCase().contains(con)||
+                        mov.getCuenta().toLowerCase().contains(con) ||
+                        mov.getCatePadre().toLowerCase().contains(con))
                 {
                     movTemp=mov;
                 }
@@ -714,7 +909,7 @@ public class activity_movimientos extends AppCompatActivity
         return temp;
     }
 
-    private ArrayList<CMovimiento> FiltroxContenido(ArrayList<CMovimiento> listaMovimientosFiltrado, CFiltroMovimientos filtro) {
+   /* private ArrayList<CMovimiento> FiltroxContenido(ArrayList<CMovimiento> listaMovimientosFiltrado, CFiltroMovimientos filtro) {
         ArrayList<CMovimiento> temp =  new ArrayList<CMovimiento>();
         if((filtro.getContenido()!=null)||(filtro.getContenido()!=""))
         {
@@ -724,7 +919,8 @@ public class activity_movimientos extends AppCompatActivity
                 if(mov.getCategoria().toLowerCase().contains(con) ||
                     mov.getHashtag().contains(con) ||
                     mov.getDescripcion().contains(con)||
-                    mov.getCuenta().contains(con))
+                    mov.getCuenta().contains(con) ||
+                    mov.getCatePadre().contains(con))
                 {
                     temp.add(mov);
                 }
@@ -745,7 +941,7 @@ public class activity_movimientos extends AppCompatActivity
             }
         }
         return temp;
-    }
+    }*/
 
     private ArrayList<CMovimiento> FiltroEntreFechas(CFiltroMovimientos filtro)  throws ParseException {
         CargarFiltro(filtro);
@@ -812,15 +1008,17 @@ public class activity_movimientos extends AppCompatActivity
 
     private void CargarTotales(){
         Double total= _totalIngreso-_totalEgreso;
-        txtIngreso.setText("INGRESO: " + Double.toString(_totalIngreso));
-        txtEgreso.setText("EGRESO : " + Double.toString(_totalEgreso));
-        txtTotales.setText("TOTAL  : " + Double.toString(total));
+        txtIngreso.setText(String.format("INGRESO: %.2f",_totalIngreso));
+        txtEgreso.setText(String.format("EGRESO: %.2f",_totalEgreso));
+        txtTotales.setText(String.format("TOTAL: %.2f",total));
+        if(total<0)
+            txtTotales.setBackgroundColor(getResources().getColor(R.color.colorSub));
 
         //viewTotales.setLayoutParams(new TableLayout.LayoutParams(txtTotales.getMinimumWidth(),2));
     }
 
     public void LimpiarFiltro() throws ParseException {
-        filtroMovimiento.setFecha(0);
+        filtroMovimiento.setFecha(1);
         filtroMovimiento.setContenido("");
         filtroMovimiento.setFiltroPorFecha(false);
         filtroMovimiento.setTipo(0);

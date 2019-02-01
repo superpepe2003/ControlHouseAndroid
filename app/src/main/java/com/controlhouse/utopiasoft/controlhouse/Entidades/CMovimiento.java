@@ -14,6 +14,7 @@ public class CMovimiento {
     private String hashtag;
     private Boolean Tipo;
     private String catePadre;
+    private Boolean isChecked;
 
     private int idCategoria;
     private int idCuenta;
@@ -21,7 +22,7 @@ public class CMovimiento {
     public CMovimiento() {
     }
 
-    public CMovimiento(int id, Date fecha, String categoria, String catPadre, String cuenta, double monto, String descripcion, String hashtag, Boolean tipo, int idCategoria, int idCuenta) {
+    public CMovimiento(int id, Date fecha, String categoria, String catPadre, String cuenta, double monto, String descripcion, String hashtag, Boolean tipo, int idCategoria, int idCuenta, boolean isChecked) {
         this.id = id;
         this.fecha = fecha;
         this.categoria = categoria;
@@ -33,6 +34,7 @@ public class CMovimiento {
         this.idCategoria = idCategoria;
         this.idCuenta = idCuenta;
         this.catePadre=catPadre;
+        this.isChecked=isChecked;
     }
 
     public int getId() {
@@ -123,5 +125,11 @@ public class CMovimiento {
         this.catePadre = catePadre;
     }
 
+    public Boolean getChecked() {
+        return isChecked;
+    }
 
+    public void setChecked(Boolean checked) {
+        isChecked = checked;
+    }
 }

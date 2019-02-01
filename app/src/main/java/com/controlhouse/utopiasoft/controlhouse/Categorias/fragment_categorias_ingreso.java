@@ -1,12 +1,8 @@
 package com.controlhouse.utopiasoft.controlhouse.Categorias;
 
-import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +13,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -28,9 +23,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CCategorias;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CConeccion;
-import com.controlhouse.utopiasoft.controlhouse.Entidades.IFiltro;
-import com.controlhouse.utopiasoft.controlhouse.Movimientos.fragment_lista_categorias;
-import com.controlhouse.utopiasoft.controlhouse.Movimientos.fragment_movimientos_ingreso;
 import com.controlhouse.utopiasoft.controlhouse.R;
 
 import org.json.JSONArray;
@@ -57,10 +49,20 @@ public class fragment_categorias_ingreso extends DialogFragment implements Respo
     JsonObjectRequest jsonObjectRequest;
 
     int catePadreId=0;
+    boolean inActividad;
+    private onActualizarListaCategoriaListener listener;
 
-    public fragment_categorias_ingreso(List<CCategorias> cates, int tipo) {
+
+    public interface onActualizarListaCategoriaListener{
+        void onActualizarListaCategoria(List<CCategorias> listaCategorias);
+    }
+
+    public void setOnActualizarListaCategoriaListener(onActualizarListaCategoriaListener listener){this.listener=listener;}
+
+    public fragment_categorias_ingreso(List<CCategorias> cates, int tipo, boolean inActividad) {
         this.listaCategorias= cates;
         this.tipo=tipo;
+        this.inActividad=inActividad;
     }
 
 
@@ -93,9 +95,23 @@ public class fragment_categorias_ingreso extends DialogFragment implements Respo
         btnPadreCategorias.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragment_lista_categorias frg = new fragment_lista_categorias(listapadres, -1, tipo,false);
-                frg.setTargetFragment(fragment_categorias_ingreso.this,1);
+                fragment_lista_categorias frg = new fragment_lista_categorias(soloPadres(),-1, tipo,1);
+                //frg.setTargetFragment(fragment_categorias_ingreso.this,1);
                 frg.show(getActivity().getSupportFragmentManager(), "dialog");
+                frg.setOnClickListCategoriaListener(new fragment_lista_categorias.onClickListCategoriaListener() {
+                    @Override
+                    public void onItemClick(int id, String nombre) {
+                        if(id!=-1) {
+                            catePadreId=id;
+                            btnPadreCategorias.setText(nombre);
+                        }
+                        else
+                        {
+                            catePadreId=0;
+                            btnPadreCategorias.setText("?");
+                        }
+                    }
+                });
             }
         });
 
@@ -138,23 +154,6 @@ public class fragment_categorias_ingreso extends DialogFragment implements Respo
         return false;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1)
-        {
-            int _idCate= data.getIntExtra("id", -1);
-            if(_idCate!=-1) {
-                catePadreId=_idCate;
-                btnPadreCategorias.setText(getCategoriaId(catePadreId));
-            }
-            else
-            {
-                catePadreId=0;
-                btnPadreCategorias.setText("?");
-            }
-        }
-    }
 
     public String getCategoriaId(int id)
     {
@@ -240,7 +239,13 @@ public class fragment_categorias_ingreso extends DialogFragment implements Respo
                     CargarCategorias();
 
                     /*fragment_lista_categorias f = (fragment_lista_categorias) (getActivity()).getSupportFragmentManager().findFragmentByTag("dialogListaCategoria");
-                    f.CargarExpandLisView();
+                    f.CargarExpandLisView();*/
+
+                    /*if(!inActividad) {
+                        fragment_lista_categorias f = (fragment_lista_categorias) (getActivity()).getSupportFragmentManager().findFragmentByTag("dialogListaCategoria");
+                        CargarCategorias();
+                        f.CargarExpandLisView();
+                    }
 
                     dismiss();*/
                 } else
@@ -271,9 +276,10 @@ public class fragment_categorias_ingreso extends DialogFragment implements Respo
 
                     listaCategorias.add(cat);
                 }
-                fragment_lista_categorias f = (fragment_lista_categorias) (getActivity()).getSupportFragmentManager().findFragmentByTag("dialogListaCategoria");
-                f.setPonerListaCategorias(listaCategorias);
-                f.CargarExpandLisView();
+
+                if(listener!=null)
+                    listener.onActualizarListaCategoria(listaCategorias);
+
 
                 dismiss();
             }

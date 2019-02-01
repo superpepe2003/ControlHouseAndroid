@@ -80,18 +80,32 @@
     <string name="cuenta_campo_nombre">Nombre de Cuenta</string>
     <string name="cuenta_campo_saldo">Saldo</string>
 
-    <!-- SALDO -->
+    <!-- CATEGORIAS -->
     <string name="categoria_campo_nombre">Nombre de Categoria</string>
     <string name="categoria_campo_categoriapadre">Categoria Padre</string>
     <string name="categoria_campo_isfija">Se repite mensualmente</string>
     <string name="categoria_campo_monto">Monto fijo</string>
+    <string name="categoria_nav_header">Categorias</string>
+    <string name="categoria_nav_header_subtitle">Ingresos y Egresos</string>
 
+    <string name="nav_categorias_ingreso">Ingreso</string>
+    <string name="nav_categorias_egreso">Egreso</string>
+
+    <!-- TRANSACCIONES -->
+    <string name="transacciones_boton_grabar">Grabar</string>
+
+    <string name="transacciones_campo_cuentaorigen">Cuenta Origen</string>
+    <string name="transacciones_campo_cuentadestino">Cuenta Destino</string>
+    <string name="transacciones_campo_fecha">Fecha</string>
+    <string name="transacciones_campo_monto">Monto</string>
+    <string name="transacciones_campo_descripcion">Descripcion</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="nav_header_title">Control House</string>
     <string name="nav_header_subtitle">pablofretes@gmail.com</string>
+    <string name="title_activity_categorias">Categorias</string>
 
 
 </resources>

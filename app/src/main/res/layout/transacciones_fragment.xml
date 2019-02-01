@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Transacciones.transacciones_fragment"
+    android:background="@color/colorForeBlanco">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center">
+
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimaryLight">
+
+                <ImageButton
+                    android:id="@+id/btnCloseTransacciones"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/combobox"
+                    android:src="@drawable/ic_action_close" />
+
+                <TextView
+                    android:id="@+id/txtTituloDialogFragment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_toEndOf="@+id/btnCloseTransacciones"
+                    android:layout_toRightOf="@+id/btnCloseTransacciones"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginStart="350dp"
+                    android:layout_marginLeft="350dp"
+                    android:layout_marginTop="0dp"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btnAgregarTransacciones"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginRight="@dimen/movimientos_margen_entre_botones"
+                        android:background="@drawable/combobox"
+                        android:src="@drawable/ic_action_add_negro" />
+
+                    <!--<ImageButton
+                        android:id="@+id/btn_eliminar"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginLeft="@dimen/movimientos_margen_entre_botones"
+                        android:layout_marginRight="@dimen/movimientos_margen_entre_botones"
+                        android:background="@drawable/combobox"
+                        android:src="@drawable/ic_action_filtro" />-->
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/txtSaldoTotalTransaccion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="0"
+                    android:textColor="@color/colorForeBlanco"
+                    android:background="@color/colorPrimaryDark"
+                    android:textSize="12sp"
+                />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/separador"
+                    android:scaleType="fitXY" />
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/idListaTransacciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"></android.support.v7.widget.RecyclerView>
+        </LinearLayout>
+
+    </ScrollView>
+</FrameLayout>

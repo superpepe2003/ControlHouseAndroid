@@ -1,10 +1,14 @@
 package com.controlhouse.utopiasoft.controlhouse.Cuentas;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +22,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -25,12 +30,16 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.controlhouse.utopiasoft.controlhouse.Categorias.activity_categorias;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CCategorias;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CConeccion;
 import com.controlhouse.utopiasoft.controlhouse.Entidades.CCuenta;
+import com.controlhouse.utopiasoft.controlhouse.Entidades.CMovimiento;
 import com.controlhouse.utopiasoft.controlhouse.Movimientos.AdaptadorMovimientos;
 import com.controlhouse.utopiasoft.controlhouse.Movimientos.activity_movimientos;
+import com.controlhouse.utopiasoft.controlhouse.Movimientos.fragment_movimientos_filtros;
 import com.controlhouse.utopiasoft.controlhouse.R;
+import com.controlhouse.utopiasoft.controlhouse.Transacciones.transacciones_fragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,7 +48,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class activity_cuentas extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, Response.ErrorListener, Response.Listener<JSONObject> {
+        implements NavigationView.OnNavigationItemSelectedListener, Response.ErrorListener, Response.Listener<JSONObject>, cuentas_fragment_ingreso.iActualiza {
 
     RecyclerView recyclerCuentas;
     ArrayList<CCuenta> listaCuentas;
@@ -59,8 +68,9 @@ public class activity_cuentas extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();*/
+                CargarDialogIngreso();
             }
         });
 
@@ -90,14 +100,30 @@ public class activity_cuentas extends AppCompatActivity
         {
             saldo+=c.getSaldo();
         }
-        txtSaldoTotal.setText(String.valueOf(saldo));
+        txtSaldoTotal.setText(String.format("TOTAL: %.2f", saldo));
         if(saldo<0)
-            txtSaldoTotal.setTextColor(getResources().getColor(R.color.colorSub));
+            txtSaldoTotal.setBackgroundColor(getResources().getColor(R.color.colorSub));
     }
 
     private void cargarWsCuentas()
     {
         jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, CConeccion.URL_Listar_Cuentas + CConeccion.bd, null, this,this);
+        request.add(jsonObjectRequest);
+    }
+
+    public void modificarWsCuentas(int id)
+    {
+        CCuenta cue=getCuenta(id);
+        if(cue!=null) {
+            cuentas_fragment_ingreso frg = new cuentas_fragment_ingreso(true, cue.getNombre(), cue.getSaldo(), id);
+            frg.show(getSupportFragmentManager(), "modificar");
+        }
+    }
+
+    public void eliminarWsCuentas(int id)
+    {
+        String Url= CConeccion.Url_Eliminar_Cuentas + CConeccion.bd + "&id=" + id;
+        jsonObjectRequest= new JsonObjectRequest(Request.Method.GET, Url, null, this,this);
         request.add(jsonObjectRequest);
     }
 
@@ -139,8 +165,33 @@ public class activity_cuentas extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_movimientos) {
+        if(id==R.id.nav_cuentas_nueva){
+            CargarDialogIngreso();
+        }
+        else if(id==R.id.nav_cuentas_transacciones){
+            FragmentManager fr =  getSupportFragmentManager();
+            transacciones_fragment fragment_transacciones =  new transacciones_fragment(listaCuentas,0,"");
+            fragment_transacciones.setCancelable(false);
+
+            // The device is smaller, so show the fragment fullscreen
+            FragmentTransaction transaction = fr.beginTransaction();
+            // For a little polish, specify a transition animation
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            // To make it fullscreen, use the 'content' root view as the container
+            // for the fragment, which is always the root view for the activity
+            transaction.add(android.R.id.content, fragment_transacciones)
+                    .addToBackStack(null).commit();
+
+
+        }
+        else if (id == R.id.nav_movimientos) {
             Intent in =  new Intent(this, activity_movimientos.class);
+            startActivity(in);
+            finish();
+        }
+        else if(id==R.id.nav_categoria)
+        {
+            Intent in= new Intent(this, activity_categorias.class);
             startActivity(in);
             finish();
         }
@@ -156,7 +207,7 @@ public class activity_cuentas extends AppCompatActivity
 
     @Override
     public void onErrorResponse(VolleyError error) {
-
+        Toast.makeText(this, "Error al acceder a la Bd", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -164,6 +215,7 @@ public class activity_cuentas extends AppCompatActivity
         CCuenta cuent = null;
 
         JSONArray jsonCuentas = response.optJSONArray("cuentasmodel");
+        JSONArray jsonEliminarCuentas= response.optJSONArray("resultadoEliminar");
 
         if (jsonCuentas != null) {
             listaCuentas.clear();
@@ -187,6 +239,30 @@ public class activity_cuentas extends AppCompatActivity
             CargarAdapterRecyclerView();
             CargarSaldoTotal();
         }
+        else if(jsonEliminarCuentas!=null)
+        {
+            JSONObject jsonObject= null;
+            try {
+                jsonObject = jsonEliminarCuentas.getJSONObject(0);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            int valor =  jsonObject.optInt("valor");
+
+            if(valor==1)
+            {
+                Toast.makeText(this, "La cuenta se elimino satisfactoriamente!", Toast.LENGTH_SHORT).show();
+                onActualizaCuentas();
+            }
+            else if(valor==0)
+            {
+                Toast.makeText(this, "La cuenta no pudo eliminarse!", Toast.LENGTH_SHORT).show();
+            }
+            else if(valor==-1){
+                Toast.makeText(this, "La cuenta tiene movimientos o transacciones asociados, no se puede realizar la operacion hasta que no los elimine", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private void BorrarUsuario() {
@@ -202,9 +278,62 @@ public class activity_cuentas extends AppCompatActivity
 
     private void CargarAdapterRecyclerView() {
         AdaptadorCuentas adapter = new AdaptadorCuentas(listaCuentas);
-
         recyclerCuentas.setAdapter(adapter);
+
+        adapter.setOnItemButtonClick(new AdaptadorCuentas.OnItemButtonClick() {
+            @Override
+            public void onItemEdita(int id) {
+                modificarWsCuentas(id);
+            }
+
+            @Override
+            public void onItemDetalla(int id) {
+                transacciones_fragment tranDialog = new transacciones_fragment(null,id, "Transacciones de " + getCuenta(id).getNombre());
+                tranDialog.show(getSupportFragmentManager(),"TransaccionesDeCuenta");
+            }
+
+            @Override
+            public void onItemElimina(final int id) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(activity_cuentas.this, R.style.MyAlertDialogStyle);
+                dialog.setTitle("Confirmar");
+                dialog.setMessage("¿Desea Eliminar la Cuenta?");
+                dialog.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        eliminarWsCuentas(id);
+                    }
+                });
+                dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                dialog.show();
+            }
+        });
 
         recyclerCuentas.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
     }
+
+    public CCuenta getCuenta(int id)
+    {
+        for(CCuenta cue:listaCuentas){
+            if(cue.getId()==id)
+                return cue;
+        }
+        return null;
+    }
+
+    @Override
+    public void onActualizaCuentas() {
+        cargarWsCuentas();
+    }
+
+    public void CargarDialogIngreso()
+    {
+        cuentas_fragment_ingreso frg = new cuentas_fragment_ingreso(false, "", 0, 0);
+        frg.show(getSupportFragmentManager(),"ingreso");
+    }
+
 }
